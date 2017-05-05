@@ -18,38 +18,41 @@
 
 namespace Soro {
 
-void VideoClient::onServerStreamingMessageInternal(QDataStream& stream) {
+void VideoClient::onServerStreamingMessageInternal(QDataStream& stream)
+{
     QString formatSerial;
     stream >> formatSerial;
     _format.deserialize(formatSerial);
 }
 
-void VideoClient::onServerStartMessageInternal() {
-    _format.setEncoding(VideoFormat::Encoding_Null);
+void VideoClient::onServerStartMessageInternal()
+{
+    _profile = GStreamerUtil::VideoProfile();
 }
 
-void VideoClient::onServerEosMessageInternal() {
-    _format.setEncoding(VideoFormat::Encoding_Null);
+void VideoClient::onServerEosMessageInternal()
+{
+    _profile = GStreamerUtil::VideoProfile();
 }
 
-void VideoClient::onServerErrorMessageInternal() {
-    _format.setEncoding(VideoFormat::Encoding_Null);
+void VideoClient::onServerErrorMessageInternal()
+{
+    _profile = GStreamerUtil::VideoProfile();
+}
+
+void VideoClient::onServerDisconnectedInternal()
+{
+    _profile = GStreamerUtil::VideoProfile();
 }
 
 VideoClient::VideoClient(int mediaId, SocketAddress server, QHostAddress host, QObject *parent)
-    : MediaClient("VideoClient " + QString::number(mediaId), mediaId, server, host, parent) {
+    : MediaClient("VideoClient " + QString::number(mediaId), mediaId, server, host, parent) { }
 
-    _format.setEncoding(VideoFormat::Encoding_Null);
-}
-
-VideoFormat VideoClient::getVideoFormat() const {
-    return _format;
+GStreamerUtil::VideoProfile VideoClient::getVideoProfile() const
+{
+    return _profile;
 }
 
 void VideoClient::onServerConnectedInternal() { }
-
-void VideoClient::onServerDisconnectedInternal() {
-    _format.setEncoding(VideoFormat::Encoding_Null);
-}
 
 } // namespace Soro

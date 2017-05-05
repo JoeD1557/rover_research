@@ -34,7 +34,8 @@ SOURCES += main.cpp \
     videoclient.cpp \
     audioclient.cpp \
     qmlgstreamerglitem.cpp \
-    qmlgstreamerpainteditem.cpp
+    qmlgstreamerpainteditem.cpp \
+    camerasettingsmodel.cpp
 
 HEADERS  += \
     settingsmodel.h \
@@ -58,7 +59,8 @@ HEADERS  += \
     mainwindowcontroller.h \
     controlwindowcontroller.h \
     maincontroller.h \
-    commentswindowcontroller.h
+    commentswindowcontroller.h \
+    camerasettingsmodel.h
 
 RESOURCES += \
     qml.qrc \

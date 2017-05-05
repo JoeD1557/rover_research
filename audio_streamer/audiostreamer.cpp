@@ -14,48 +14,115 @@
  * limitations under the License.
  */
 
-#include "core/constants.h"
-#include "core/logger.h"
-
 #include "audiostreamer.h"
+#include "gstreamerutil.h"
+#include "core/logger.h"
+#include "core/constants.h"
+
+#include <Qt5GStreamer/QGlib/Connect>
+#include <Qt5GStreamer/QGst/Bus>
+
+#include <sys/types.h>
+#include <unistd.h>
+
+#define LogTag "MediaStreamer"
 
 namespace Soro {
 
-AudioStreamer::AudioStreamer(QString sourceDevice, AudioFormat format, SocketAddress bindAddress, SocketAddress address, quint16 ipcPort, QObject *parent)
-        : MediaStreamer("AudioStreamer", parent)
+AudioStreamer::AudioStreamer(QObject *parent) : QObject(parent)
 {
-    if (!connectToParent(ipcPort)) return;
+    if (!QDBusConnection::sessionBus().isConnected())
+    {
+        // Not connected to d-bus
+        LOG_E(LogTag, "Not connected to D-Bus system bus");
+        exit(12);
+    }
 
-    LOG_I(LOG_TAG, "Creating pipeline");
-    _pipeline = createPipeline();
+    // Register this class as a D-Bus RPC service so other processes can call our public slots
+    if (!QDBusConnection::sessionBus().registerObject("/", this, QDBusConnection::ExportAllSlots))
+    {
+        LOG_E(LogTag, "Cannot register as D-Bus RPC object: " + QDBusConnection::sessionBus().lastError().message());
+        exit(13);
+    }
+
+    _parentInterface = new QDBusInterface(SORO_DBUS_AUDIO_PARENT_SERVICE_NAME, "/", "", QDBusConnection::sessionBus(), this);
+    if (!_parentInterface->isValid())
+    {
+        // Could not create interface for parent process
+        LOG_E(LogTag, "D-Bus parent interface is not valid");
+        exit(14);
+    }
+
+    _parentInterface->call(QDBus::NoBlock, "onChildReady", (qint64)getpid());
+}
+
+AudioStreamer::~AudioStreamer()
+{
+    stop();
+}
+
+void AudioStreamer::stop()
+{
+    stopPrivate(true);
+}
+
+void AudioStreamer::stopPrivate(bool sendReady)
+{
+    if (_pipeline)
+    {
+        QGlib::disconnect(_pipeline->bus(), "message", this, &AudioStreamer::onBusMessage);
+        _pipeline->setState(QGst::StateNull);
+        _pipeline.clear();
+        if (sendReady)
+        {
+            _parentInterface->call(QDBus::NoBlock, "onChildReady", (qint64)getpid());
+        }
+    }
+}
+
+void AudioStreamer::streamAudio(QString address, quint16 port, QString profile)
+{
+    stopPrivate(false);
+
+    _pipeline = QGst::Pipeline::create("audio");
 
     // create gstreamer command
-    QString binStr = "alsasrc device=%1 ! "
-                     "%2 ! "
-                     "udpsink bind-address=%3 bind-port=%4 host=%5 port=%6";
-
-    binStr = binStr.arg(sourceDevice,
-                        format.createGstEncodingArgs(),
-                        bindAddress.host.toString(),
-                        QString::number(bindAddress.port),
-                        address.host.toString(),
-                        QString::number(address.port));
-
-    LOG_I(LOG_TAG, "Creating gstreamer bin " + binStr);
-
+    QString binStr = GStreamerUtil::createRtpAlsaEncodeString(QHostAddress(address), port, GStreamerUtil::AudioProfile(profile));
     QGst::BinPtr encoder = QGst::Bin::fromDescription(binStr);
 
-    LOG_I(LOG_TAG, "Created gstreamer bin " + binStr);
-
     _pipeline->add(encoder);
-
-    LOG_I(LOG_TAG, "Elements linked on pipeline");
-
-    // play
     _pipeline->setState(QGst::StatePlaying);
 
-    LOG_I(LOG_TAG, "Stream started");
+    _parentInterface->call(QDBus::NoBlock, "onChildStreaming", (qint64)getpid());
+}
 
+QGst::PipelinePtr AudioStreamer::createPipeline()
+{
+    QGst::PipelinePtr pipeline = QGst::Pipeline::create("audio");
+    pipeline->bus()->addSignalWatch();
+    QGlib::connect(pipeline->bus(), "message", this, &AudioStreamer::onBusMessage);
+
+    return pipeline;
+}
+
+void AudioStreamer::onBusMessage(const QGst::MessagePtr & message)
+{
+    QByteArray errorMessage;
+    switch (message->type())
+    {
+    case QGst::MessageEos:
+        _parentInterface->call(QDBus::NoBlock, "onChildError", (qint64)getpid(), "Received EOS message from GStreamer");
+        stopPrivate(true);
+        break;
+    case QGst::MessageError:
+        errorMessage = message.staticCast<QGst::ErrorMessage>()->error().message().toLatin1();
+        _parentInterface->call(QDBus::NoBlock, "onChildError", (qint64)getpid(), errorMessage);
+        stopPrivate(true);
+        break;
+    default:
+        break;
+    }
 }
 
 } // namespace Soro
+

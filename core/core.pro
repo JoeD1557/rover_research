@@ -17,7 +17,7 @@ RCC_DIR = $$BUILD_DIR
 UI_DIR = $$BUILD_DIR
 PRECOMPILED_DIR = $$BUILD_DIR
 
-SOURCES += audioformat.cpp \
+SOURCES += \
     channel.cpp \
     csvrecorder.cpp \
     drivemessage.cpp \
@@ -26,13 +26,11 @@ SOURCES += audioformat.cpp \
     logger.cpp \
     mbedchannel.cpp \
     nmeamessage.cpp \
-    videoformat.cpp \
     socketaddress.cpp \
     sensordataparser.cpp \
-    mediastreamer.cpp
+    gstreamerutil.cpp
 
 HEADERS += core_global.h \
-    audioformat.h \
     channel.h \
     constants.h \
     csvrecorder.h \
@@ -43,12 +41,10 @@ HEADERS += core_global.h \
     latnlg.h \
     logger.h \
     mbedchannel.h \
-    mediaformat.h \
     nmeamessage.h \
     util.h \
-    videoformat.h \
     socketaddress.h \
     sensordataparser.h \
-    mediastreamer.h
+    gstreamerutil.h
 
 

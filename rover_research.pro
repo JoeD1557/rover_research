@@ -16,12 +16,12 @@ TEMPLATE = subdirs
 
 SUBDIRS =\
     core \
-    audio_streamer \
     video_streamer \
+    audio_streamer \
     rover \
     mission_control
 
-audio_streamer.depends = core
 video_streamer.depends = core
+audio_streamer.depends = core
 rover.depends = core audio_streamer video_streamer
 mission_control.depends = core audio_streamer video_streamer

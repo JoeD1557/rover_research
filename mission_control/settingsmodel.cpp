@@ -38,7 +38,8 @@ SettingsModel SettingsModel::Default(QHostAddress roverAddress)
     model.selectedHudParallax = 0;
     model.selectedHudLatency = 100;
 
-    model.defaultAudioFormat = AudioFormat(AudioFormat::Encoding_AC3, 32000);
+    model.defaultAudioFormat.codec = GStreamerUtil::AUDIO_CODEC_AC3;
+    model.defaultAudioFormat.bitrate = 32000;
 
     model.cameraNames << "Main Camera [Mono/Stereo]";   model.mainCameraIndex = 0;
     model.cameraNames << "Fisheye Camera [Mono]";       model.aux1CameraIndex = 1;
@@ -116,8 +117,8 @@ void SettingsModel::setSelectedCamera(int mediaId)
 
 VideoFormat SettingsModel::getSelectedVideoFormat()
 {
-    VideoFormat format;
-    format.setEncoding(static_cast<VideoFormat::Encoding>(selectedVideoEncoding));
+    GStreamerUtil::VideoProfile profile;
+    profile.codec = selectedVideoEncoding;
     format.setResolution(static_cast<VideoFormat::Resolution>(selectedVideoResolution));
     format.setBitrate(selectedVideoBitrate * 1000);
     format.setFramerate(selectedVideoFramerate);

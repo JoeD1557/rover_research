@@ -8,7 +8,7 @@
 #include <QList>
 
 #include "core/channel.h"
-#include "core/videoformat.h"
+#include "core/gstreamerutil.h"
 #include "core/socketaddress.h"
 
 #include "mediaclient.h"
@@ -24,10 +24,10 @@ class VideoClient : public MediaClient {
 public:
     explicit VideoClient(int mediaId, SocketAddress server, QHostAddress host, QObject *parent = 0);
 
-    VideoFormat getVideoFormat() const;
+    GStreamerUtil::VideoProfile getVideoProfile() const;
 
 private:
-    VideoFormat _format;
+    GStreamerUtil::VideoProfile _profile;
 
 protected:
     void onServerStreamingMessageInternal(QDataStream& stream) Q_DECL_OVERRIDE;

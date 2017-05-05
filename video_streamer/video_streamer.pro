@@ -1,23 +1,28 @@
-QT += core network
+QT += core network dbus
 
 CONFIG += c++11 no_keywords
 CONFIG += console
 CONFIG -= app_bundle
-TARGET = core
-TEMPLATE = app
+
+TARGET = video_streamer
 
 BUILD_DIR = ../build/video_streamer
 DESTDIR = ../bin
-OBJECTS_DIR = $$BUILD_DIR
-MOC_DIR = $$BUILD_DIR
-RCC_DIR = $$BUILD_DIR
-UI_DIR = $$BUILD_DIR
-PRECOMPILED_DIR = $$BUILD_DIR
 
-HEADERS += videostreamer.h
+TEMPLATE = app
 
-SOURCES += main.cpp \
-videostreamer.cpp
+HEADERS += \
+    videostreamer.h
+
+SOURCES += \
+main.cpp \
+    videostreamer.cpp
+
+# The following define makes your compiler emit warnings if you use
+# any feature of Qt which as been marked deprecated (the exact warnings
+# depend on your compiler). Please consult the documentation of the
+# deprecated API in order to know how to port your code away from it.
+DEFINES += QT_DEPRECATED_WARNINGS
 
 # Include headers from other subprojects
 INCLUDEPATH += $$PWD/..
@@ -25,4 +30,5 @@ INCLUDEPATH += $$PWD/..
 #Link Qt5GStreamer
 LIBS += -lQt5GStreamer-1.0 -lQt5GLib-2.0
 
+# Link against core
 LIBS += -L../lib -lcore

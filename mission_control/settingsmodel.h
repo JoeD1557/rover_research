@@ -5,9 +5,8 @@
 #include <QQuickWindow>
 #include <QHostAddress>
 
-#include "core/videoformat.h"
-#include "core/audioformat.h"
 #include "core/constants.h"
+#include "core/gstreamerutil.h"
 
 namespace Soro {
 
@@ -38,14 +37,14 @@ struct SettingsModel {
     QStringList cameraNames;
     QStringList videoEncodingNames;
     QStringList videoResolutionNames;
-    AudioFormat defaultAudioFormat;
+    GStreamerUtil::AudioProfile defaultAudioFormat;
 
     static SettingsModel Default(QHostAddress roverAddress);
 
     void syncUi(QQuickWindow *window);
     void syncModel(const QQuickWindow *window);
     void setSelectedCamera(int mediaId);
-    VideoFormat getSelectedVideoFormat();
+    GStreamerUtil::VideoProfile getSelectedVideoFormat();
 };
 
 } // namespace Soro

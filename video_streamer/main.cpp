@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 The University of Oklahoma.
+ * Copyright 2017 The University of Oklahoma.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,133 +17,42 @@
 #include <QCoreApplication>
 #include <QByteArray>
 #include <QDataStream>
+#include <QtDBus>
 
-//#include <flycapture/FlyCapture2.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <Qt5GStreamer/QGst/Init>
-#include <Qt5GStreamer/QGst/Element>
-#include <Qt5GStreamer/QGst/ElementFactory>
-
-#include "core/socketaddress.h"
-#include "core/enums.h"
-#include "core/constants.h"
-#include "core/logger.h"
 
 #include "videostreamer.h"
+#include "core/logger.h"
+#include "core/constants.h"
 
-#define LOG_TAG "Main"
+#define LogTag "Main"
 
 using namespace Soro;
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QCoreApplication::setOrganizationName("Sooner Rover");
+    QCoreApplication::setOrganizationDomain("ou.edu/soonerrover");
+    QCoreApplication::setApplicationName("Video Streamer");
+    QCoreApplication app(argc, argv);
 
-    Logger::rootLogger()->setLogfile(QCoreApplication::applicationDirPath()
-                                     + "/../log/Video_" + QDateTime::currentDateTime().toString("M-dd_h.mm.ss_AP") + ".log");
-    Logger::rootLogger()->setMaxFileLevel(Logger::LogLevelDebug);
-    Logger::rootLogger()->setMaxStdoutLevel(Logger::LogLevelDisabled);
-
-    LOG_I(LOG_TAG, "Starting...");
+    LOG_I(LogTag, "Starting...");
     QGst::init();
 
-    if (argc < 8)
-    {
-        LOG_E(LOG_TAG, "Not enough arguments (expected 8, got " + QString::number(argc) + ")");
-        return STREAMPROCESS_ERR_NOT_ENOUGH_ARGUMENTS;
+    if (!QDBusConnection::sessionBus().isConnected()) {
+        LOG_E(LogTag, "Cannot connect to D-Bus session bus");
+        return 10;
     }
 
-    bool ok;
-    VideoFormat format;
-    QString device;
-    SocketAddress address;
-    SocketAddress bindAddress;
-    quint16 ipcPort;
-
-    /*
-     * Parse device
-     */
-    device = argv[1];
-    LOG_I(LOG_TAG, "Device: " + device);
-
-    /*
-     * Parse format
-     */
-    QString formatSerial = QString(argv[2]);
-    LOG_I(LOG_TAG, "Format: " + formatSerial);
-    format.deserialize(formatSerial);
-
-    /*
-     * Parse destination address
-     */
-    address.host = QHostAddress(argv[3]);
-    address.port = QString(argv[4]).toInt(&ok);
-    if ((address.host == QHostAddress::Null) | (address.host == QHostAddress::Any) | !ok)
-    {
-        LOG_E(LOG_TAG, "Invalid address '" + QString(argv[3]) + ":" + QString(argv[4]) + "'");
-        // invalid address
-        return STREAMPROCESS_ERR_INVALID_ARGUMENT;
+    if (!QDBusConnection::sessionBus().registerService(SORO_DBUS_VIDEO_CHILD_SERVICE_NAME(QString::number(getpid())))) {
+        LOG_E(LogTag, "Cannot register D-Bus service: " + QDBusConnection::sessionBus().lastError().message());
+        return 11;
     }
-    LOG_I(LOG_TAG, "Address: " + address.toString());
 
-    /*
-     * Parse bind address
-     */
-    bindAddress.host = QHostAddress(argv[5]);
-    bindAddress.port = QString(argv[6]).toInt(&ok);
-    if ((bindAddress.host == QHostAddress::Null) | !ok)
-    {
-        // invalid host
-         LOG_E(LOG_TAG, "Invalid bind address '" + QString(argv[5]) + ":" + QString(argv[6]) + "'");
-        return STREAMPROCESS_ERR_INVALID_ARGUMENT;
-    }
-    LOG_I(LOG_TAG, "Bind Address: " + address.toString());
+    VideoStreamer s(&app);
 
-    /*
-     * Parse IPC Port
-     */
-    ipcPort = QString(argv[7]).toInt(&ok);
-    if (!ok)
-    {
-        // invalid IPC port
-        LOG_E(LOG_TAG, "Invalid IPC port '" + QString(argv[7]) + "'");
-        return STREAMPROCESS_ERR_INVALID_ARGUMENT;
-    }
-    LOG_I(LOG_TAG, "IPC Port: " + QString::number(ipcPort));
-
-    a.setApplicationName("VideoStream for " + device + " to " + address.toString());
-
-    /*if (device.startsWith("FlyCapture2:", Qt::CaseInsensitive))
-    {
-        QGst::ElementPtr source;
-        // parse GUID
-        FlyCapture2::PGRGuid guid;
-        device = device.mid(device.indexOf(":") + 1);
-        guid.value[0] = device.mid(0, device.indexOf(":")).toUInt(&ok);
-        if (!ok) return STREAMPROCESS_ERR_INVALID_ARGUMENT;
-        device = device.mid(device.indexOf(":") + 1);
-        guid.value[1] = device.mid(0, device.indexOf(":")).toUInt(&ok);
-        if (!ok) return STREAMPROCESS_ERR_INVALID_ARGUMENT;
-        device = device.mid(device.indexOf(":") + 1);
-        guid.value[2] = device.mid(0, device.indexOf(":")).toUInt(&ok);
-        if (!ok) return STREAMPROCESS_ERR_INVALID_ARGUMENT;
-        device = device.mid(device.indexOf(":") + 1);
-        guid.value[3] = device.toUInt(&ok);
-        if (!ok) return STREAMPROCESS_ERR_INVALID_ARGUMENT;
-
-        FlycapCamera camera(guid, &a);
-        source = camera.element();
-
-        LOG_I(LOG_TAG, "Parset parameters for FlyCapture successfully");
-        VideoStreamer stream(source, format, bindAddress, address, ipcPort, &a);
-        LOG_I(LOG_TAG, "Stream initialized for FlyCapture successfully");
-        return a.exec();
-    }
-    else
-    {*/
-        LOG_I(LOG_TAG, "Creating stream object");
-        VideoStreamer stream(device, format, bindAddress, address, ipcPort, &a);
-        LOG_I(LOG_TAG, "Stream object created");
-        return a.exec();
-    //}
+    return app.exec();
 }
