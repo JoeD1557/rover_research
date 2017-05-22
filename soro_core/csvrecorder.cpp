@@ -61,7 +61,7 @@ bool CsvRecorder::startLog(QDateTime loggedStartTime)
     }
 
     _logStartTime = loggedStartTime.toMSecsSinceEpoch();
-    filePath += "/" + QString::number(_logStartTime) + ".csv";
+    filePath += "/" + loggedStartTime.toString("M-dd_h.mm.ss_AP") + ".csv";
     _file = new QFile(filePath, this);
 
     if (_file->exists())
@@ -186,7 +186,7 @@ void CsvRecorder::timerEvent(QTimerEvent *e)
         {
             if ((_columnDataTimestamps.value(column) != column->getValueTime()) || column->shouldKeepOldValues())
             {
-                *_fileStream << column->getValue().toString() << "," << (column->getValueTime() - _logStartTime) << ",";
+                *_fileStream << column->getValue().toString() << "," << (column->getValueTime() > 0 ? QString::number(column->getValueTime() - _logStartTime) : "---") << ",";
                 _columnDataTimestamps.insert(column, column->getValueTime());
             }
             else {
