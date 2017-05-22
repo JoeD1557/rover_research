@@ -46,7 +46,7 @@ void VideoServer::start(QString deviceName, GStreamerUtil::VideoProfile profile,
 
 void VideoServer::start(QString leftDeviceName, QString rightDeviceName, GStreamerUtil::VideoProfile profile, bool vaapi) {
     _videoDevice = leftDeviceName + "," + rightDeviceName;
-    LOG_I(LOG_TAG, "start(): Streaming " + _videoDevice);
+    LOG_I(LOG_TAG, "start(): Streaming " + _videoDevice + " with profile " + profile.toString());
     _profile = profile;
     _vaapi = vaapi;
     _stereo = true;

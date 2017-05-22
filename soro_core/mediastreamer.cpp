@@ -36,6 +36,7 @@ void MediaStreamer::stop() {
     }
     if (_ipcSocket) {
         LOG_I(LOG_TAG, "stop(): deleting IPC socket");
+        disconnect(_ipcSocket, 0, this, 0);
         delete _ipcSocket;
         _ipcSocket = nullptr;
     }
