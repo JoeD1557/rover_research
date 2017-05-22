@@ -20,7 +20,15 @@ namespace Soro {
 class MainController : public QObject
 {
     Q_OBJECT
+public:
+    static void init(QCoreApplication *app);
+    static void panic(QString tag, QString message);
+
 private:
+    explicit MainController(QObject *parent=0);
+
+    static MainController *_self;
+
     /* Connects to mission control for command and status communication
      */
     Channel *_driveChannel = 0;
@@ -52,7 +60,6 @@ private:
     SensorDataParser *_sensorDataSeries;
 
 private Q_SLOTS:
-    void init();
     void sendSystemStatusMessage();
     void mainChannelStateChanged(Channel::State state);
     void driveChannelStateChanged(Channel::State state);
@@ -64,10 +71,6 @@ private Q_SLOTS:
     void mediaServerError(MediaServer* server, QString message);
     bool startDataRecording(QDateTime startTime);
     void stopDataRecording();
-
-public:
-    explicit MainController(QObject *parent = 0);
-    ~MainController();
 };
 
 } // namespace Soro

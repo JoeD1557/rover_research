@@ -23,161 +23,183 @@
 
 namespace Soro {
 
-MainController::MainController(QObject *parent) : QObject(parent)
+MainController *MainController::_self = nullptr;
+
+MainController::MainController(QObject *parent) : QObject(parent) { }
+
+void MainController::panic(QString tag, QString message)
 {
-    // Must initialize once the event loop has started.
-    // This can be accomplished using a single shot timer.
-    QTimer::singleShot(1, this, SLOT(init()));
+    LOG_E(LOG_TAG, QString("panic(): %1: %2").arg(tag, message));
+    LOG_I(LOG_TAG, "Committing suicide...");
+    delete _self;
+    LOG_I(LOG_TAG, "Exiting with code 1");
+    exit(1);
 }
 
-void MainController::init() {
-    LOG_I(LOG_TAG, "*************Initializing core networking*****************");
-
-    _driveChannel = Channel::createServer(this, NETWORK_ALL_DRIVE_CHANNEL_PORT, CHANNEL_NAME_DRIVE,
-                              Channel::UdpProtocol, QHostAddress::Any);
-    _mainChannel = Channel::createServer(this, NETWORK_ALL_MAIN_CHANNEL_PORT, CHANNEL_NAME_MAIN,
-                              Channel::TcpProtocol, QHostAddress::Any);
-
-    if (_driveChannel->getState() == Channel::ErrorState) {
-        LOG_E(LOG_TAG, "The drive channel experienced a fatal error during initialization");
-        exit(1); return;
+void MainController::init(QCoreApplication *app)
+{
+    if (_self)
+    {
+        LOG_E(LOG_TAG, "init() called when already initialized");
     }
-    if (_mainChannel->getState() == Channel::ErrorState) {
-        LOG_E(LOG_TAG, "The shared channel experienced a fatal error during initialization");
-        exit(1); return;
-    }
+    else
+    {
+        _self = new MainController(app);
 
-    _driveChannel->open();
-    _mainChannel->open();
+        // Use a timer to wait for the event loop to start
+        QTimer::singleShot(0, _self, []()
+        {
+            Logger::rootLogger()->setLogfile(QCoreApplication::applicationDirPath()
+                                             + "/../log/ResearchRover_" + QDateTime::currentDateTime().toString("M-dd_h.mm.ss_AP") + ".log");
+            Logger::rootLogger()->setMaxFileLevel(Logger::LogLevelDebug);
+            Logger::rootLogger()->setMaxStdoutLevel(Logger::LogLevelInformation);
 
-    // observers for network channel connectivity changes
-    connect(_mainChannel, &Channel::stateChanged, this, &MainController::mainChannelStateChanged);
-    connect(_driveChannel, &Channel::stateChanged, this, &MainController::driveChannelStateChanged);
+            LOG_I(LOG_TAG, "*************Initializing core networking*****************");
 
+            _self->_driveChannel = Channel::createServer(_self, NETWORK_ALL_DRIVE_CHANNEL_PORT, CHANNEL_NAME_DRIVE,
+                                      Channel::UdpProtocol, QHostAddress::Any);
+            _self->_mainChannel = Channel::createServer(_self, NETWORK_ALL_MAIN_CHANNEL_PORT, CHANNEL_NAME_MAIN,
+                                      Channel::TcpProtocol, QHostAddress::Any);
 
-    LOG_I(LOG_TAG, "All network channels initialized successfully");
-
-    LOG_I(LOG_TAG, "*****************Initializing MBED systems*******************");
-
-    // create mbed channels
-    _mbed = new MbedChannel(SocketAddress(QHostAddress::Any, NETWORK_ROVER_MBED_PORT), MBED_ID, this);
-
-    // observers for mbed events
-    connect(_mbed, &MbedChannel::messageReceived, this, &MainController::mbedMessageReceived);
-    connect(_mbed, &MbedChannel::stateChanged, this, &MainController::mbedChannelStateChanged);
-
-    // observers for network channels message received
-    connect(_driveChannel, &Channel::messageReceived, this, &MainController::driveChannelMessageReceived);
-    connect(_mainChannel, &Channel::messageReceived, this, &MainController::mainChannelMessageReceived);
-
-    LOG_I(LOG_TAG, "*****************Initializing GPS system*******************");
-
-    _gpsServer = new GpsServer(SocketAddress(QHostAddress::Any, NETWORK_ROVER_GPS_PORT), this);
-    connect(_gpsServer, &GpsServer::gpsUpdate, this, &MainController::gpsUpdate);
-
-    LOG_I(LOG_TAG, "*****************Initializing Video system*******************");
-
-    _mainCameraServer = new VideoServer(MEDIAID_MAIN_CAMERA, NETWORK_ALL_MAIN_CAMERA_PORT, this);
-    _aux1CameraServer = new VideoServer(MEDIAID_AUX1_CAMERA, NETWORK_ALL_AUX1_CAMERA_PORT, this);
-
-    connect(_mainCameraServer, &VideoServer::error, this, &MainController::mediaServerError);
-    connect(_aux1CameraServer, &VideoServer::error, this, &MainController::mediaServerError);
-
-    UsbCameraEnumerator cameras;
-    cameras.loadCameras();
-
-    QFile camFile(QCoreApplication::applicationDirPath() + "/../config/research_cameras.conf");
-    if (!camFile.exists()) {
-        LOG_E(LOG_TAG, "The camera configuration file ../config/research_cameras.conf does not exist.");
-        exit(1);
-    }
-    else {
-        ConfLoader camConfig;
-        camConfig.load(camFile);
-
-        const UsbCamera* stereoRight = cameras.find(camConfig.value("sr_matchName"),
-                                        camConfig.value("sr_matchDevice"),
-                                        camConfig.value("sr_matchVendorId"),
-                                        camConfig.value("sr_matchProductId"),
-                                        camConfig.value("sr_matchSerial"));
-
-        const UsbCamera* stereoLeft = cameras.find(camConfig.value("sr_matchName"),
-                                        camConfig.value("sl_matchDevice"),
-                                        camConfig.value("sl_matchVendorId"),
-                                        camConfig.value("sl_matchProductId"),
-                                        camConfig.value("sl_matchSerial"));
-
-        const UsbCamera* aux1 = cameras.find(camConfig.value("a1_matchName"),
-                                        camConfig.value("a1_matchDevice"),
-                                        camConfig.value("a1_matchVendorId"),
-                                        camConfig.value("a1_matchProductId"),
-                                        camConfig.value("a1_matchSerial"));
-
-        if (stereoRight) {
-            _stereoRCameraDevice = stereoRight->device;
-            _monoCameraDevice = _stereoRCameraDevice;
-            LOG_I(LOG_TAG, "Right stereo camera found: " + stereoRight->toString());
-        }
-        else {
-            LOG_E(LOG_TAG, "Right stereo camera couldn't be found using provided definition.");
-        }
-        if (stereoLeft) {
-            _stereoLCameraDevice = stereoLeft->device;
-            if (!stereoRight) {
-                _monoCameraDevice = _stereoLCameraDevice;
+            if (_self->_driveChannel->getState() == Channel::ErrorState) {
+                panic(LOG_TAG, "The drive channel experienced a fatal error during initialization");
             }
-            LOG_I(LOG_TAG, "Left stereo camera found: " + stereoLeft->toString());
-        }
-        else {
-            LOG_E(LOG_TAG, "Left stereo camera couldn't be found using provided definition.");
-        }
-        if (aux1) {
-            _aux1CameraDevice = aux1->device;
-            LOG_I(LOG_TAG, "Aux1 camera found: " + aux1->toString());
-        }
-        else {
-            LOG_E(LOG_TAG, "Aux1 camera couldn't be found using provided definition.");
-        }
+            if (_self->_mainChannel->getState() == Channel::ErrorState) {
+                panic(LOG_TAG, "The shared channel experienced a fatal error during initialization");
+            }
 
+            _self->_driveChannel->open();
+            _self->_mainChannel->open();
+
+            // observers for network channel connectivity changes
+            connect(_self->_mainChannel, &Channel::stateChanged, _self, &MainController::mainChannelStateChanged);
+            connect(_self->_driveChannel, &Channel::stateChanged, _self, &MainController::driveChannelStateChanged);
+
+
+            LOG_I(LOG_TAG, "All network channels initialized successfully");
+
+            LOG_I(LOG_TAG, "*****************Initializing MBED systems*******************");
+
+            // create mbed channels
+            _self->_mbed = new MbedChannel(SocketAddress(QHostAddress::Any, NETWORK_ROVER_MBED_PORT), MBED_ID, _self);
+
+            // observers for mbed events
+            connect(_self->_mbed, &MbedChannel::messageReceived, _self, &MainController::mbedMessageReceived);
+            connect(_self->_mbed, &MbedChannel::stateChanged, _self, &MainController::mbedChannelStateChanged);
+
+            // observers for network channels message received
+            connect(_self->_driveChannel, &Channel::messageReceived, _self, &MainController::driveChannelMessageReceived);
+            connect(_self->_mainChannel, &Channel::messageReceived, _self, &MainController::mainChannelMessageReceived);
+
+            LOG_I(LOG_TAG, "*****************Initializing GPS system*******************");
+
+            _self->_gpsServer = new GpsServer(SocketAddress(QHostAddress::Any, NETWORK_ROVER_GPS_PORT), _self);
+            connect(_self->_gpsServer, &GpsServer::gpsUpdate, _self, &MainController::gpsUpdate);
+
+            LOG_I(LOG_TAG, "*****************Initializing Video system*******************");
+
+            _self->_mainCameraServer = new VideoServer(MEDIAID_MAIN_CAMERA, NETWORK_ALL_MAIN_CAMERA_PORT, _self);
+            _self->_aux1CameraServer = new VideoServer(MEDIAID_AUX1_CAMERA, NETWORK_ALL_AUX1_CAMERA_PORT, _self);
+
+            connect(_self->_mainCameraServer, &VideoServer::error, _self, &MainController::mediaServerError);
+            connect(_self->_aux1CameraServer, &VideoServer::error, _self, &MainController::mediaServerError);
+
+            UsbCameraEnumerator cameras;
+            cameras.loadCameras();
+
+            QFile camFile(QCoreApplication::applicationDirPath() + "/../config/research_cameras.conf");
+            if (!camFile.exists()) {
+                panic(LOG_TAG, "The camera configuration file ../config/research_cameras.conf does not exist.");
+            }
+            else {
+                ConfLoader camConfig;
+                camConfig.load(camFile);
+
+                const UsbCamera* stereoRight = cameras.find(camConfig.value("sr_matchName"),
+                                                camConfig.value("sr_matchDevice"),
+                                                camConfig.value("sr_matchVendorId"),
+                                                camConfig.value("sr_matchProductId"),
+                                                camConfig.value("sr_matchSerial"));
+
+                const UsbCamera* stereoLeft = cameras.find(camConfig.value("sr_matchName"),
+                                                camConfig.value("sl_matchDevice"),
+                                                camConfig.value("sl_matchVendorId"),
+                                                camConfig.value("sl_matchProductId"),
+                                                camConfig.value("sl_matchSerial"));
+
+                const UsbCamera* aux1 = cameras.find(camConfig.value("a1_matchName"),
+                                                camConfig.value("a1_matchDevice"),
+                                                camConfig.value("a1_matchVendorId"),
+                                                camConfig.value("a1_matchProductId"),
+                                                camConfig.value("a1_matchSerial"));
+
+                if (stereoRight) {
+                    _self->_stereoRCameraDevice = stereoRight->device;
+                    _self->_monoCameraDevice = _self->_stereoRCameraDevice;
+                    LOG_I(LOG_TAG, "Right stereo camera found: " + stereoRight->toString());
+                }
+                else {
+                    LOG_E(LOG_TAG, "Right stereo camera couldn't be found using provided definition.");
+                }
+                if (stereoLeft) {
+                    _self->_stereoLCameraDevice = stereoLeft->device;
+                    if (!stereoRight) {
+                        _self->_monoCameraDevice = _self->_stereoLCameraDevice;
+                    }
+                    LOG_I(LOG_TAG, "Left stereo camera found: " + stereoLeft->toString());
+                }
+                else {
+                    LOG_E(LOG_TAG, "Left stereo camera couldn't be found using provided definition.");
+                }
+                if (aux1) {
+                    _self->_aux1CameraDevice = aux1->device;
+                    LOG_I(LOG_TAG, "Aux1 camera found: " + aux1->toString());
+                }
+                else {
+                    LOG_E(LOG_TAG, "Aux1 camera couldn't be found using provided definition.");
+                }
+
+            }
+
+            LOG_I(LOG_TAG, "*****************Initializing Audio system*******************");
+
+            _self->_audioServer = new AudioServer(MEDIAID_AUDIO, NETWORK_ALL_AUDIO_PORT, _self);
+
+            connect(_self->_audioServer, &AudioServer::error, _self, &MainController::mediaServerError);
+
+            LOG_I(LOG_TAG, "*****************Initializing Data Recording System*******************");
+
+            _self->_sensorDataSeries = new SensorDataParser(_self);
+            _self->_gpsDataSeries = new GpsCsvSeries(_self);
+            _self->_dataRecorder = new CsvRecorder(_self);
+
+            _self->_dataRecorder->setUpdateInterval(50);
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getWheelPowerASeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getWheelPowerBSeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getWheelPowerCSeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getWheelPowerDSeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getWheelPowerESeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getWheelPowerFSeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuRearYawSeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuRearPitchSeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuRearRollSeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuFrontYawSeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuFrontPitchSeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuFrontRollSeries());
+            _self->_dataRecorder->addColumn(_self->_gpsDataSeries->getLatitudeSeries());
+            _self->_dataRecorder->addColumn(_self->_gpsDataSeries->getLongitudeSeries());
+            connect(_self->_gpsServer, &GpsServer::gpsUpdate, _self->_gpsDataSeries, &GpsCsvSeries::addLocation);
+            connect(_self->_mbed, &MbedChannel::messageReceived, _self->_sensorDataSeries, &SensorDataParser::newData);
+
+            LOG_I(LOG_TAG, "-------------------------------------------------------");
+            LOG_I(LOG_TAG, "-------------------------------------------------------");
+            LOG_I(LOG_TAG, "-------------------------------------------------------");
+            LOG_I(LOG_TAG, "Initialization complete");
+            LOG_I(LOG_TAG, "-------------------------------------------------------");
+            LOG_I(LOG_TAG, "-------------------------------------------------------");
+            LOG_I(LOG_TAG, "-------------------------------------------------------");
+        });
     }
-
-    LOG_I(LOG_TAG, "*****************Initializing Audio system*******************");
-
-    _audioServer = new AudioServer(MEDIAID_AUDIO, NETWORK_ALL_AUDIO_PORT, this);
-
-    connect(_audioServer, &AudioServer::error, this, &MainController::mediaServerError);
-
-    LOG_I(LOG_TAG, "*****************Initializing Data Recording System*******************");
-
-    _sensorDataSeries = new SensorDataParser(this);
-    _gpsDataSeries = new GpsCsvSeries(this);
-    _dataRecorder = new CsvRecorder(this);
-
-    _dataRecorder->setUpdateInterval(50);
-    _dataRecorder->addColumn(_sensorDataSeries->getWheelPowerASeries());
-    _dataRecorder->addColumn(_sensorDataSeries->getWheelPowerBSeries());
-    _dataRecorder->addColumn(_sensorDataSeries->getWheelPowerCSeries());
-    _dataRecorder->addColumn(_sensorDataSeries->getWheelPowerDSeries());
-    _dataRecorder->addColumn(_sensorDataSeries->getWheelPowerESeries());
-    _dataRecorder->addColumn(_sensorDataSeries->getWheelPowerFSeries());
-    _dataRecorder->addColumn(_sensorDataSeries->getImuRearYawSeries());
-    _dataRecorder->addColumn(_sensorDataSeries->getImuRearPitchSeries());
-    _dataRecorder->addColumn(_sensorDataSeries->getImuRearRollSeries());
-    _dataRecorder->addColumn(_sensorDataSeries->getImuFrontYawSeries());
-    _dataRecorder->addColumn(_sensorDataSeries->getImuFrontPitchSeries());
-    _dataRecorder->addColumn(_sensorDataSeries->getImuFrontRollSeries());
-    _dataRecorder->addColumn(_gpsDataSeries->getLatitudeSeries());
-    _dataRecorder->addColumn(_gpsDataSeries->getLongitudeSeries());
-    connect(_gpsServer, &GpsServer::gpsUpdate, _gpsDataSeries, &GpsCsvSeries::addLocation);
-    connect(_mbed, &MbedChannel::messageReceived, _sensorDataSeries, &SensorDataParser::newData);
-
-    LOG_I(LOG_TAG, "-------------------------------------------------------");
-    LOG_I(LOG_TAG, "-------------------------------------------------------");
-    LOG_I(LOG_TAG, "-------------------------------------------------------");
-    LOG_I(LOG_TAG, "Initialization complete");
-    LOG_I(LOG_TAG, "-------------------------------------------------------");
-    LOG_I(LOG_TAG, "-------------------------------------------------------");
-    LOG_I(LOG_TAG, "-------------------------------------------------------");
 }
 
 void MainController::mainChannelStateChanged(Channel::State state) {
@@ -378,10 +400,6 @@ void MainController::gpsUpdate(NmeaMessage message) {
     stream << message;
 
     _mainChannel->sendMessage(byteArray);
-}
-
-MainController::~MainController() {
-
 }
 
 } // namespace Soro
