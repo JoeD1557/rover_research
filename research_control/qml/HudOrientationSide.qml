@@ -25,8 +25,10 @@ Item {
 
     property alias rearPitch: impl.rearPitch
     property alias frontPitch: impl.frontPitch
+    property alias middlePitch: impl.middlePitch
     property alias frontPitchZero: impl.frontPitchZero
     property alias rearPitchZero: impl.rearPitchZero
+    property alias middlePitchZero: impl.middlePitchZero
     property Item blurSource
 
     width: height

@@ -126,7 +126,6 @@ QGst::ElementPtr MainWindowController::getVideoSink()
 
 void MainWindowController::onSensorUpdate(char tag, int value)
 {
-    // TODO 3rd IMU
     switch (tag) {
     case SensorDataParser::DATATAG_WHEELPOWER_A:
         _window->setProperty("wheelMLPower", value);
@@ -157,6 +156,12 @@ void MainWindowController::onSensorUpdate(char tag, int value)
         break;
     case SensorDataParser::DATATAG_IMUDATA_FRONT_ROLL:
         _window->setProperty("frontRoll", value);
+        break;
+    case SensorDataParser::DATATAG_IMUDATA_MIDDLE_PITCH:
+        _window->setProperty("middlePitch", value);
+        break;
+    case SensorDataParser::DATATAG_IMUDATA_MIDDLE_ROLL:
+        _window->setProperty("middleRoll", value);
         break;
     }
 }

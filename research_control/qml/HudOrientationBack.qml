@@ -24,7 +24,9 @@ Item {
 
     property alias rearRoll: impl.rearRoll
     property alias frontRoll: impl.frontRoll
+    property alias middleRoll: impl.middleRoll
     property alias frontRollZero: impl.frontRollZero
+    property alias middleRollZero: impl.middleRollZero
     property alias rearRollZero: impl.rearRollZero
     property Item blurSource
 

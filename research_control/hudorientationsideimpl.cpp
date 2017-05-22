@@ -23,6 +23,7 @@ HudOrientationSideImpl::HudOrientationSideImpl(QQuickItem *parent): AbstractHudO
 {
     _frontPitch = _frontPitchZero = 400;
     _rearPitch = _rearPitchZero = 400;
+    _middlePitch = _middlePitchZero = 400;
 }
 
 float HudOrientationSideImpl::pitchToDegrees(float pitch, float pitchZero)
@@ -105,6 +106,17 @@ float HudOrientationSideImpl::getRearPitch() const
     return _rearPitch;
 }
 
+void HudOrientationSideImpl::setMiddlePitch(float middlePitch)
+{
+    _middlePitch = middlePitch;
+    update();
+}
+
+float HudOrientationSideImpl::getMiddlePitch() const
+{
+    return _middlePitch;
+}
+
 void HudOrientationSideImpl::setFrontPitchZero(float frontPitchZero)
 {
     _frontPitchZero = frontPitchZero;
@@ -125,6 +137,17 @@ void HudOrientationSideImpl::setRearPitchZero(float rearPitchZero)
 float HudOrientationSideImpl::getRearPitchZero() const
 {
     return _rearPitchZero;
+}
+
+void HudOrientationSideImpl::setMiddlePitchZero(float middlePitchZero)
+{
+    _middlePitchZero = middlePitchZero;
+    update();
+}
+
+float HudOrientationSideImpl::getMiddlePitchZero() const
+{
+    return _middlePitchZero;
 }
 
 } // namespace Soro

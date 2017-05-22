@@ -85,6 +85,19 @@ void SensorDataParser::parseBuffer()
             //data = (data - 100) * (360/800) - 180;
             _imuFrontRollSeries.update(QVariant(data));
             break;
+        case DATATAG_IMUDATA_MIDDLE_YAW:
+            _imuFrontYawSeries.update(QVariant(data));
+            break;
+        case DATATAG_IMUDATA_MIDDLE_PITCH:
+            // P: [ 100 - 800 ] -> [ -90, 90 ]
+            //data = (data - 100) * (180/800) - 90;
+            _imuFrontPitchSeries.update(QVariant(data));
+            break;
+        case DATATAG_IMUDATA_MIDDLE_ROLL:
+            // R: [ 100 - 900 ] -> [ -180, 180 ]
+            //data = (data - 100) * (360/800) - 180;
+            _imuFrontRollSeries.update(QVariant(data));
+            break;
         default:
             // Something went wrong trying to parse
             // Remove the first char and try to parse again
@@ -166,6 +179,21 @@ const SensorDataParser::ImuFrontRollCsvSeries* SensorDataParser::getImuFrontRoll
     return &_imuFrontRollSeries;
 }
 
+const SensorDataParser::ImuMiddleYawCsvSeries* SensorDataParser::getImuMiddleYawSeries() const
+{
+    return &_imuMiddleYawSeries;
+}
+
+const SensorDataParser::ImuMiddlePitchCsvSeries* SensorDataParser::getImuMiddlePitchSeries() const
+{
+    return &_imuMiddlePitchSeries;
+}
+
+const SensorDataParser::ImuMiddleRollCsvSeries* SensorDataParser::getImuMiddleRollSeries() const
+{
+    return &_imuMiddleRollSeries;
+}
+
 bool SensorDataParser::isValidTag(char c)
 {
     return (c == DATATAG_WHEELPOWER_A) ||
@@ -175,12 +203,14 @@ bool SensorDataParser::isValidTag(char c)
             (c == DATATAG_WHEELPOWER_E) ||
             (c == DATATAG_WHEELPOWER_F) ||
             (c == DATATAG_IMUDATA_REAR_YAW) ||
-            (c == DATATAG_IMUDATA_REAR_YAW) ||
             (c == DATATAG_IMUDATA_REAR_PITCH) ||
             (c == DATATAG_IMUDATA_REAR_ROLL) ||
             (c == DATATAG_IMUDATA_FRONT_YAW) ||
             (c == DATATAG_IMUDATA_FRONT_PITCH) ||
-            (c == DATATAG_IMUDATA_FRONT_ROLL);
+            (c == DATATAG_IMUDATA_FRONT_ROLL) ||
+            (c == DATATAG_IMUDATA_MIDDLE_YAW) ||
+            (c == DATATAG_IMUDATA_MIDDLE_PITCH) ||
+            (c == DATATAG_IMUDATA_MIDDLE_ROLL);
 }
 
 } // namespace Soro
