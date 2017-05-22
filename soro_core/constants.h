@@ -17,7 +17,9 @@
 #ifndef SORO_CONSTANTS_H
 #define SORO_CONSTANTS_H
 
+#ifdef QT_CORE_LIB
 #include <QCoreApplication>
+#endif
 
 /* Timer macros
  */
