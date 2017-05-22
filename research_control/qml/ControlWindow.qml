@@ -553,8 +553,8 @@ ApplicationWindow {
             clip: false
             anchors.right: parent.right
             anchors.rightMargin: 0
-            anchors.bottomMargin: 8
-            anchors.bottom: settingsFooterPane.state == "visible" ? settingsFooterPane.top : parent.bottom
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: settingsFooterPane.height
             anchors.left: parent.left
             anchors.leftMargin: 0
             anchors.top: parent.top
