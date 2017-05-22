@@ -18,8 +18,6 @@
  * This code can be compiled on a Qt or mbed enviornment *
  *********************************************************/
 
-#include <QtCore>
-
 #ifndef SORO_ENUMS_H
 #define SORO_ENUMS_H
 
