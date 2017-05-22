@@ -313,6 +313,9 @@ void MainController::init(QApplication *app)
                     _self, &MainController::onWindowClosed);
             connect(_self->_commentsWindow, &CommentsWindowController::closed,
                     _self, &MainController::onWindowClosed);
+
+            connect(_self->_mainChannel, &Channel::stateChanged,
+                    _self->_commentsWindow, &CommentsWindowController::setConnectionState);
         });
     }
 }
