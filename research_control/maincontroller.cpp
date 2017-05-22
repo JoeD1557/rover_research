@@ -179,11 +179,6 @@ void MainController::init(QApplication *app)
             connect(_self->_gamepad, &GamepadManager::gamepadChanged,
                     _self->_driveSystem, &DriveControlSystem::gamepadChanged);
 
-            connect(_self->_mainChannel, &Channel::stateChanged,
-                    _self->_connectionEventSeries, &ConnectionEventCsvSeries::mainChannelStateChanged);
-            connect(_self->_driveSystem->getChannel(), &Channel::stateChanged,
-                    _self->_connectionEventSeries, &ConnectionEventCsvSeries::driveChannelStateChanged);
-
             _self->_mainChannel->open();
             _self->_driveSystem->enable();
 
@@ -247,6 +242,11 @@ void MainController::init(QApplication *app)
             _self->_dataRecorder->addColumn(_self->_latencyDataSeries->getRealLatencySeries());
             _self->_dataRecorder->addColumn(_self->_latencyDataSeries->getSimulatedLatencySeries());
             _self->_dataRecorder->addColumn(_self->_commentDataSeries);
+
+            connect(_self->_mainChannel, &Channel::stateChanged,
+                    _self->_connectionEventSeries, &ConnectionEventCsvSeries::mainChannelStateChanged);
+            connect(_self->_driveSystem->getChannel(), &Channel::stateChanged,
+                    _self->_connectionEventSeries, &ConnectionEventCsvSeries::driveChannelStateChanged);
 
             //
             // Initialize QML engine and register custom items
