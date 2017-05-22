@@ -106,11 +106,7 @@ void MediaServer::stop() {
             LOG_I(LOG_TAG, "stop(): Streaming process has been terminated");
         }
     }
-    else {
-        if (_state != WaitingState) {
-            LOG_E(LOG_TAG, "stop(): Child process is not running and we are not in WaitingState. That's weird.");
-        }
-    }
+
     if (_ipcSocket) {
         LOG_I(LOG_TAG, "stop(): IPC socket is active, closing it");
         disconnect(_ipcSocket, 0, 0, 0);

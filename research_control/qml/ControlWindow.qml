@@ -559,7 +559,7 @@ ApplicationWindow {
             anchors.leftMargin: 0
             anchors.top: parent.top
             anchors.topMargin: 8
-            contentHeight: contentItem.childrenRect.height
+            contentHeight: settingsPane.height
 
             Pane {
                 id: settingsPane

@@ -296,6 +296,8 @@ void MainController::init(QApplication *app)
                     _self->_mainWindow, &MainWindowController::onZeroHudOrientationClicked);
             connect(_self->_gamepad, &GamepadManager::gamepadChanged,
                     _self->_controlWindow, &ControlWindowController::onGamepadChanged);
+            connect(_self->_mainChannel, &Channel::stateChanged,
+                    _self->_controlWindow, &ControlWindowController::setConnectionState);
 
             connect(_self->_controlWindow, &ControlWindowController::recordButtonClicked,
                     _self, &MainController::toggleDataRecording);
@@ -316,6 +318,9 @@ void MainController::init(QApplication *app)
 
             connect(_self->_mainChannel, &Channel::stateChanged,
                     _self->_commentsWindow, &CommentsWindowController::setConnectionState);
+
+            // Force an initial UI sync
+            _self->onRequestUiSync();
         });
     }
 }
@@ -422,6 +427,7 @@ void MainController::onVideoClientStateChanged(MediaClient *client, MediaClient:
 {
     if (client == _aux1VideoClient)
     {
+        LOG_I(LOG_TAG, "Aux1 video client is changing states");
         switch (state) {
         case VideoClient::StreamingState: {
             GStreamerUtil::VideoProfile profile = _aux1VideoClient->getVideoProfile();
@@ -433,7 +439,7 @@ void MainController::onVideoClientStateChanged(MediaClient *client, MediaClient:
             _gstreamerRecorder->begin(profile.codec, QDateTime::currentDateTime(), _settings.useVaapiDecodeForCodec.value(profile.codec, false), false);
         }
             break;
-        case VideoClient::ConnectingState: {
+        default: {
             _mainWindow->stopVideo();
             _settings.enableVideo = false;
             _mainWindow->setSideBySideStereo(false);
@@ -442,11 +448,11 @@ void MainController::onVideoClientStateChanged(MediaClient *client, MediaClient:
             _gstreamerRecorder->stop();
         }
             break;
-        default: break;
         }
     }
     else if (client == _mainVideoClient)
     {
+        LOG_I(LOG_TAG, "Main video client is changing states");
         switch (state) {
         case VideoClient::StreamingState: {
             GStreamerUtil::VideoProfile profile = _mainVideoClient->getVideoProfile();
@@ -458,16 +464,18 @@ void MainController::onVideoClientStateChanged(MediaClient *client, MediaClient:
             _gstreamerRecorder->begin(profile.codec, QDateTime::currentDateTime(), _settings.useVaapiDecodeForCodec.value(profile.codec, false), false);
         }
             break;
-        case VideoClient::ConnectingState: {
-            _mainWindow->stopVideo();
-            _settings.enableVideo = false;
-            _mainWindow->setSideBySideStereo(false);
-            _settings.enableStereoVideo = false;
-            _controlWindow->updateFromSettingsModel(&_settings);
-            _gstreamerRecorder->stop();
+        default: {
+            if (_settings.enableVideo)
+            {
+                _mainWindow->stopVideo();
+                _settings.enableVideo = false;
+                _mainWindow->setSideBySideStereo(false);
+                _settings.enableStereoVideo = false;
+                _controlWindow->updateFromSettingsModel(&_settings);
+                _gstreamerRecorder->stop();
+            }
         }
             break;
-        default: break;
         }
     }
 }
@@ -475,6 +483,7 @@ void MainController::onVideoClientStateChanged(MediaClient *client, MediaClient:
 void MainController::onAudioClientStateChanged(MediaClient *client, MediaClient::State state)
 {
     Q_UNUSED(client);
+    LOG_I(LOG_TAG, "Audio client is changing states");
 
     switch (state)
     {
@@ -485,12 +494,14 @@ void MainController::onAudioClientStateChanged(MediaClient *client, MediaClient:
         _controlWindow->updateFromSettingsModel(&_settings);
         break;
     }
-    case AudioClient::ConnectingState:
-        _audioPlayer->stop();
-        _settings.enableAudio = false;
-        _controlWindow->updateFromSettingsModel(&_settings);
+    default:
+        if (_settings.enableAudio)
+        {
+            _audioPlayer->stop();
+            _settings.enableAudio = false;
+            _controlWindow->updateFromSettingsModel(&_settings);
+        }
         break;
-    default: break;
     }
 }
 

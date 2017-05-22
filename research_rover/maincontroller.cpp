@@ -135,6 +135,7 @@ void MainController::init(QCoreApplication *app)
 
                 if (stereoRight) {
                     _self->_stereoRCameraDevice = stereoRight->device;
+                    _self->_stereoRCameraDevice.remove("/dev/");
                     _self->_monoCameraDevice = _self->_stereoRCameraDevice;
                     LOG_I(LOG_TAG, "Right stereo camera found: " + stereoRight->toString());
                 }
@@ -143,6 +144,7 @@ void MainController::init(QCoreApplication *app)
                 }
                 if (stereoLeft) {
                     _self->_stereoLCameraDevice = stereoLeft->device;
+                    _self->_stereoLCameraDevice.remove("/dev/");
                     if (!stereoRight) {
                         _self->_monoCameraDevice = _self->_stereoLCameraDevice;
                     }
@@ -153,6 +155,7 @@ void MainController::init(QCoreApplication *app)
                 }
                 if (aux1) {
                     _self->_aux1CameraDevice = aux1->device;
+                    _self->_aux1CameraDevice.remove("/dev/");
                     LOG_I(LOG_TAG, "Aux1 camera found: " + aux1->toString());
                 }
                 else {

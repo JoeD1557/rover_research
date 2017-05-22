@@ -36,6 +36,7 @@ ControlWindowController::ControlWindowController(QQmlEngine *engine, QObject *pa
 
 void ControlWindowController::updateSettingsModel(SettingsModel *model) const
 {
+    LOG_I(LOG_TAG, "Syncing settings with UI choices...");
     model->enableHud = _window->property("enableHud").toBool();
     model->enableVideo = _window->property("enableVideo").toBool();
     model->enableStereoVideo = _window->property("enableStereoVideo").toBool();
@@ -55,6 +56,8 @@ void ControlWindowController::updateSettingsModel(SettingsModel *model) const
 
 void ControlWindowController::updateFromSettingsModel(const SettingsModel *model)
 {
+    LOG_I(LOG_TAG, "Syncing UI with settings...");
+
     // Prepare the view to be synced
     QMetaObject::invokeMethod(_window, "prepareForUiSync");
 
