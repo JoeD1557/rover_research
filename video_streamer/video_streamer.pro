@@ -15,7 +15,7 @@ HEADERS += \
     videostreamer.h
 
 SOURCES += \
-main.cpp \
+    main.cpp \
     videostreamer.cpp
 
 # The following define makes your compiler emit warnings if you use
@@ -28,7 +28,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 INCLUDEPATH += $$PWD/..
 
 #Link Qt5GStreamer
-LIBS += -lQt5GStreamer-1.0 -lQt5GLib-2.0
+LIBS += -lQt5GStreamer-1.0 -lQt5GLib-2.0 -lQt5GStreamerUtils-1.0
 
 # Link against core
-LIBS += -L../lib -lcore
+LIBS += -L../lib -lsoro_core

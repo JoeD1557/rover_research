@@ -20,7 +20,7 @@ SOURCES += main.cpp \
 INCLUDEPATH += $$PWD/..
 
 #Link Qt5GStreamer
-LIBS += -lQt5GStreamer-1.0 -lQt5GLib-2.0
+LIBS += -lQt5GStreamer-1.0 -lQt5GLib-2.0 -lQt5GStreamerUtils-1.0
 
 # Link against core
-LIBS += -L../lib -lcore
+LIBS += -L../lib -lsoro_core

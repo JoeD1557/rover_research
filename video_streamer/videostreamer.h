@@ -1,43 +1,39 @@
-#ifndef SORO_GST_MEDIASTREAMER_H
-#define SORO_GST_MEDIASTREAMER_H
+#ifndef AUDIOSTREAMER_H
+#define AUDIOSTREAMER_H
 
 #include <QObject>
 #include <QCoreApplication>
-#include <QtDBus>
+#include <QTcpSocket>
 
+#include <Qt5GStreamer/QGst/Ui/VideoWidget>
 #include <Qt5GStreamer/QGst/Pipeline>
+#include <Qt5GStreamer/QGst/Element>
+#include <Qt5GStreamer/QGst/ElementFactory>
+#include <Qt5GStreamer/QGst/Bin>
+#include <Qt5GStreamer/QGst/Bus>
 #include <Qt5GStreamer/QGlib/RefPointer>
+#include <Qt5GStreamer/QGlib/Error>
+#include <Qt5GStreamer/QGlib/Connect>
 #include <Qt5GStreamer/QGst/Message>
+
+//#include <flycapture/FlyCapture2.h>
+
+#include "soro_core/socketaddress.h"
+#include "soro_core/gstreamerutil.h"
+#include "soro_core/mediastreamer.h"
 
 namespace Soro {
 
-/*
- * Uses a gstreamer backend to stream media to a remote address. This class does not run in the main process,
- * instead it runs in a child process is controlled by a corresponding MediaServer in the main process.
- */
-class VideoStreamer : public QObject {
+class VideoStreamer : public MediaStreamer {
     Q_OBJECT
 public:
-    VideoStreamer(QObject *parent = 0);
-    ~VideoStreamer();
+    // For mono video
+    VideoStreamer(QString deviceName, GStreamerUtil::VideoProfile profile, quint16 bindPort, SocketAddress address, quint16 ipcPort, bool vaapi, QObject *parent = 0);
 
-public Q_SLOTS:
-    void stop();
-    void stream(const QString &device, const QString &address, int port, const QString &profile, bool vaapi);
-    void streamStereo(const QString &leftDevice, const QString &rightDevice, const QString &address, int port, const QString &profile, bool vaapi);
-
-private:
-    QGst::PipelinePtr createPipeline();
-
-    void stopPrivate(bool sendReady);
-
-    QGst::PipelinePtr _pipeline;
-    QDBusInterface *_parentInterface;
-
-private Q_SLOTS:
-    void onBusMessage(const QGst::MessagePtr & message);
+    // For stereo video
+    VideoStreamer(QString leftDeviceName, QString rightDeviceName, GStreamerUtil::VideoProfile profile, quint16 bindPort, SocketAddress address, quint16 ipcPort, bool vaapi, QObject *parent = 0);
 };
 
 } // namespace Soro
 
-#endif // SORO_GST_MEDIASTREAMER_H
+#endif // AUDIOSTREAMER_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 The University of Oklahoma.
+ * Copyright 2016 The University of Oklahoma.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,42 +17,88 @@
 #include <QCoreApplication>
 #include <QByteArray>
 #include <QDataStream>
-#include <QtDBus>
-
-#include <sys/types.h>
-#include <unistd.h>
 
 #include <Qt5GStreamer/QGst/Init>
 
+#include "soro_core/socketaddress.h"
+#include "soro_core/gstreamerutil.h"
+#include "soro_core/constants.h"
+#include "soro_core/logger.h"
+
 #include "audiostreamer.h"
-#include "core/logger.h"
-#include "core/constants.h"
 
 #define LOG_TAG "Main"
 
 using namespace Soro;
 
-int main(int argc, char *argv[])
-{
-    QCoreApplication::setOrganizationName("Sooner Rover");
-    QCoreApplication::setOrganizationDomain("ou.edu/soonerrover");
-    QCoreApplication::setApplicationName("Audio Streamer");
-    QCoreApplication app(argc, argv);
+int main(int argc, char *argv[]) {
+    QCoreApplication a(argc, argv);
+
+    Logger::rootLogger()->setLogfile(QCoreApplication::applicationDirPath()
+                                     + "/../log/Audio_" + QDateTime::currentDateTime().toString("M-dd_h.mm.ss_AP") + ".log");
+    Logger::rootLogger()->setMaxFileLevel(Logger::LogLevelDebug);
+    Logger::rootLogger()->setMaxStdoutLevel(Logger::LogLevelDisabled);
 
     LOG_I(LOG_TAG, "Starting...");
     QGst::init();
 
-    if (!QDBusConnection::sessionBus().isConnected()) {
-        LOG_E(LOG_TAG, "Cannot connect to D-Bus session bus");
-        return 1;
+    if (argc < 6) {
+        LOG_E(LOG_TAG, "Not enough arguments (expected 6, got " + QString::number(argc) + ")");
+        return STREAMPROCESS_ERR_NOT_ENOUGH_ARGUMENTS;
     }
 
-    if (!QDBusConnection::sessionBus().registerService(SORO_DBUS_AUDIO_CHILD_SERVICE_NAME(QString::number(getpid())))) {
-        LOG_E(LOG_TAG, "Cannot register D-Bus service: " + QDBusConnection::sessionBus().lastError().message());
-        return 1;
+    bool ok;
+    GStreamerUtil::AudioProfile profile;
+    QString device;
+    SocketAddress address;
+    quint16 bindPort;
+    quint16 ipcPort;
+
+    /*
+     * Parse audio profile
+     */
+    QString profileString = QString(argv[1]);
+    LOG_I(LOG_TAG, "Profile: " + profileString);
+    profile = GStreamerUtil::AudioProfile(profileString);
+
+    /*
+     * Parse address
+     */
+    address.host = QHostAddress(argv[2]);
+    address.port = QString(argv[3]).toInt(&ok);
+    if ((address.host == QHostAddress::Null) | (address.host == QHostAddress::Any) | !ok) {
+        // invalid address
+        LOG_E(LOG_TAG, "Invalid address '" + QString(argv[2]) + ":" + QString(argv[3]) + "'");
+        return STREAMPROCESS_ERR_INVALID_ARGUMENT;
     }
+    LOG_I(LOG_TAG, "Address: " + address.toString());
 
-    AudioStreamer s;
+    /*
+     * Parse bind port
+     */
+    bindPort = QString(argv[4]).toInt(&ok);
+    if (!ok) {
+        // invalid host
+        LOG_E(LOG_TAG, "Invalid bind port '" + QString(argv[4]) + "'");
+        return STREAMPROCESS_ERR_INVALID_ARGUMENT;
+    }
+    LOG_I(LOG_TAG, "Bind port: " + QString::number(bindPort));
 
-    return app.exec();
+    /*
+     * Parse IPC port
+     */
+    ipcPort = QString(argv[5]).toInt(&ok);
+    if (!ok) {
+        // invalid IPC port
+        LOG_E(LOG_TAG, "Invalid IPC port '" + QString(argv[5]) + "'");
+        return STREAMPROCESS_ERR_INVALID_ARGUMENT;
+    }
+    LOG_I(LOG_TAG, "IPC Port: " + QString::number(ipcPort));
+
+    a.setApplicationName("AudioStream for " + device + " to " + address.toString());
+
+    LOG_I(LOG_TAG, "Creating stream object");
+    AudioStreamer stream(profile, bindPort, address, ipcPort, &a);
+    LOG_I(LOG_TAG, "Stream object created");
+    return a.exec();
 }

@@ -15,13 +15,13 @@
 TEMPLATE = subdirs
 
 SUBDIRS =\
-    core \
+    soro_core \
     video_streamer \
     audio_streamer \
-    rover \
-    mission_control
+    research_rover \
+    research_control
 
-video_streamer.depends = core
-audio_streamer.depends = core
-rover.depends = core audio_streamer video_streamer
-mission_control.depends = core audio_streamer video_streamer
+video_streamer.depends = soro_core
+audio_streamer.depends = soro_core
+research_rover.depends = soro_core audio_streamer video_streamer
+research_control.depends = soro_core audio_streamer video_streamer
