@@ -122,11 +122,13 @@ int main(int argc, char *argv[]) {
     {
         // For stereo streams, the device field is two devices split with a comma
         VideoStreamer stream(device.mid(0, device.indexOf(",")), device.mid(device.indexOf(",") + 1), profile, bindPort, address, ipcPort, vaapi, &a);
+        LOG_I(LOG_TAG, "Stream object created");
+        return a.exec();
     }
     else
     {
         VideoStreamer stream(device, profile, bindPort, address, ipcPort, vaapi, &a);
+        LOG_I(LOG_TAG, "Stream object created");
+        return a.exec();
     }
-    LOG_I(LOG_TAG, "Stream object created");
-    return a.exec();
 }
