@@ -59,6 +59,7 @@ ApplicationWindow {
 
     GStreamerSurface {
         id: gstreamerSurface
+        antialiasing: false
         anchors.fill: parent
     }
 
@@ -69,50 +70,122 @@ ApplicationWindow {
         HudPower {
             id: hudPower
             blurSource: gstreamerSurface
-            anchors.left: parent.left
-            anchors.leftMargin: hudParallax
-            anchors.top: parent.top
+            x: stereo ? hudParallax : 0
+            y: 0
             width: height * 0.8
             height: parent.height * 0.3
             halfWidth: stereo
             visible: hudVisible
+            enabled: visible
         }
 
         HudOrientationSide {
             id: hudOrientationSide
             blurSource: gstreamerSurface
-            anchors.left: parent.left
-            anchors.leftMargin: hudParallax
-            anchors.bottom: parent.bottom
+            x: stereo ? hudParallax : 0
+            y: overlayItem.height - height
             width: height
             height: parent.height * 0.3
             halfWidth: stereo
             visible: hudVisible
-            enabled: hudVisible
+            enabled: visible
         }
 
         HudOrientationBack {
             id: hudOrientationBack
             blurSource: gstreamerSurface
-            anchors.right: stereo ? parent.horizontalCenter : parent.right
-            anchors.bottom: parent.bottom
+            x: stereo ? overlayItem.width / 2 - width / 2 : overlayItem.width - width
+            y: overlayItem.height - height
             width: height
             height: parent.height * 0.3
             halfWidth: stereo
             visible: hudVisible
-            enabled: hudVisible
+            enabled: visible
         }
 
         HudLatency {
             id: hudLatency
             blurSource: gstreamerSurface
-            anchors.right: stereo ? parent.horizontalCenter : parent.right
-            anchors.top: parent.top
+            x: stereo ? overlayItem.width / 2 - width / 2 : overlayItem.width - width
+            y: 0
             halfWidth: stereo
             width: height
             height: parent.height * 0.6
             visible: hudVisible
-            enabled: hudVisible
+            enabled: visible
+        }
+
+
+
+
+        HudPower {
+            id: hudPower2
+            wheelBLPower: hudPower.wheelBLPower
+            wheelBRPower: hudPower.wheelBRPower
+            wheelMLPower: hudPower.wheelMLPower
+            wheelMRPower: hudPower.wheelMRPower
+            wheelFLPower: hudPower.wheelFLPower
+            wheelFRPower: hudPower.wheelFRPower
+            blurSource: gstreamerSurface
+            x: overlayItem.width / 2
+            y: 0
+            width: height * 0.8
+            height: parent.height * 0.3
+            halfWidth: true
+            visible: hudVisible && stereo
+            enabled: visible
+        }
+
+        HudOrientationSide {
+            id: hudOrientationSide2
+            rearPitch: hudOrientationSide.rearPitch
+            rearPitchZero: hudOrientationSide.rearPitchZero
+            frontPitch: hudOrientationSide.frontPitch
+            frontPitchZero: hudOrientationSide.frontPitchZero
+            middlePitch: hudOrientationSide.middlePitch
+            middlePitchZero: hudOrientationSide.middlePitchZero
+            blurSource: gstreamerSurface
+            x: overlayItem.width / 2
+            y: overlayItem.height - height
+            width: height
+            height: parent.height * 0.3
+            halfWidth: true
+            visible: hudVisible && stereo
+            enabled: visible
+        }
+
+        HudOrientationBack {
+            id: hudOrientationBack2
+            rearRoll: hudOrientationBack.rearRoll
+            rearRollZero: hudOrientationBack.rearRollZero
+            frontRoll: hudOrientationBack.frontRoll
+            frontRollZero: hudOrientationBack.frontRollZero
+            middleRoll: hudOrientationBack.middleRoll
+            middleRollZero: hudOrientationBack.middleRollZero
+            blurSource: gstreamerSurface
+            x: overlayItem.width - width / 2 - hudParallax
+            y: overlayItem.height - height;
+            width: height
+            height: parent.height * 0.3
+            halfWidth: true
+            visible: hudVisible && stereo
+            enabled: visible
+        }
+
+        HudLatency {
+            id: hudLatency2
+            latency: hudLatency.latency
+            latencyTolerance: hudLatency.latencyTolerance
+            xValue: hudLatency.xValue
+            yValue: hudLatency.yValue
+            blurSource: gstreamerSurface
+            x: overlayItem.width - width / 2 - hudParallax
+            y: 0;
+            halfWidth: true
+            width: height
+            height: parent.height * 0.6
+            visible: hudVisible && stereo
+            enabled: visible
         }
     }
 }

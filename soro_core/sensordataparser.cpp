@@ -31,6 +31,7 @@ void SensorDataParser::newData(const char* data, int len)
 
 void SensorDataParser::parseBuffer()
 {
+    qDebug() << _buffer;
     if (_buffer.length() < 4) return; // 4  is the size of a complete data point
 
     char tag = _buffer.at(0);
@@ -105,7 +106,6 @@ void SensorDataParser::parseBuffer()
             parseBuffer();
             return;
         }
-        //LOG_I(LOG_TAG, "Got value " + QString::number(data) + " for tag " + QChar(tag));
         Q_EMIT dataParsed(tag, data);
         _buffer.remove(0, 4);
         parseBuffer();

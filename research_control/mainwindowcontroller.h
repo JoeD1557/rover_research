@@ -24,6 +24,7 @@ class MainWindowController : public QObject
     Q_OBJECT
 public:
     explicit MainWindowController(QQmlEngine *engine, QObject *parent = 0);
+    ~MainWindowController();
 
     bool isHudVisible() const;
     int getHudParallax() const;

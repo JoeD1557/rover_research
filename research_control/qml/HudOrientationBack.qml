@@ -31,24 +31,27 @@ Item {
     property Item blurSource
 
     width: height
-    opacity: 0.8
 
     transform: Scale { xScale: halfWidth ? 0.5 : 1 }
 
     FastBlur {
         source: ShaderEffectSource {
            sourceItem: root.blurSource
-           sourceRect: Qt.rect(root.x + background.x, root.y + background.y, background.width, background.height)
+           sourceRect: Qt.rect(root.x + background.x,
+                               root.y + background.y,
+                               halfWidth ? background.width / 2 : background.width,
+                               background.height)
         }
-        radius: 32
+        radius: 64
         transparentBorder: true
-        anchors.margins: 14
+        anchors.margins: 4
         anchors.fill: background
     }
 
     HudBackground {
         id: background
         anchors.fill: parent
+        opacity: 0.8
     }
 
     HudOrientationBackImpl {

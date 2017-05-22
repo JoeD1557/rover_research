@@ -35,6 +35,11 @@ MainWindowController::MainWindowController(QQmlEngine *engine, QObject *parent) 
     START_TIMER(_updateLatencyTimerId, 500);
 }
 
+MainWindowController::~MainWindowController()
+{
+    resetPipeline();
+}
+
 void MainWindowController::resetPipeline()
 {
     if (!_pipeline.isNull())

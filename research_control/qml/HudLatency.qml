@@ -29,7 +29,6 @@ Item {
 
     height: 600
     width: height
-    opacity: 0.8
 
     onLatencyToleranceChanged: {
         graphX.latencyTolerance = latencyTolerance
@@ -60,22 +59,28 @@ Item {
     FastBlur {
         source: ShaderEffectSource {
            sourceItem: root.blurSource
-           sourceRect: Qt.rect(root.x + xBackground.x, root.y + xBackground.y, xBackground.width, xBackground.height)
+           sourceRect: Qt.rect(root.x + xBackground.x,
+                               root.y + xBackground.y,
+                               halfWidth ? xBackground.width / 2 : xBackground.width,
+                               xBackground.height)
         }
-        radius: 32
+        radius: 64
         transparentBorder: true
-        anchors.margins: 14
+        anchors.margins: 4
         anchors.fill: xBackground
     }
 
     FastBlur {
         source: ShaderEffectSource {
            sourceItem: root.blurSource
-           sourceRect: Qt.rect(root.x + yBackground.x, root.y + yBackground.y, yBackground.width, yBackground.height)
+           sourceRect: Qt.rect(root.x + yBackground.x,
+                               root.y + yBackground.y,
+                               halfWidth ? yBackground.width / 2 : yBackground.width,
+                               yBackground.height)
         }
-        radius: 32
+        radius: 64
         transparentBorder: true
-        anchors.margins: 14
+        anchors.margins: 4
         anchors.fill: yBackground
     }
 
@@ -86,6 +91,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
         width:  parent.height / 4
+        opacity: 0.8
     }
 
     HudBackground {
@@ -95,6 +101,7 @@ Item {
         anchors.top: parent.top
         anchors.leftMargin: 0
         height: parent.height / 4
+        opacity: 0.8
     }
 
     HudLatencyGraphImpl {

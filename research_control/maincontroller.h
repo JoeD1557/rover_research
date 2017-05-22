@@ -67,6 +67,8 @@ private:
     CommentCsvSeries *_commentDataSeries = 0;
     CsvRecorder *_dataRecorder = 0;
 
+    int _bitrateUpdateTimerId;
+
     qint64 _recordStartTime = 0;
 
 private Q_SLOTS:
@@ -91,6 +93,9 @@ private Q_SLOTS:
 
     void onAudioClientStateChanged(MediaClient *client, MediaClient::State state);
     void onVideoClientStateChanged(MediaClient *client, MediaClient::State state);
+
+protected:
+    void timerEvent(QTimerEvent *e);
 };
 
 } // namespace Soro

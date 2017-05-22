@@ -321,6 +321,9 @@ void MainController::init(QApplication *app)
 
             // Force an initial UI sync
             _self->onRequestUiSync();
+
+            // Start bitrate calculate timer
+            _self->_bitrateUpdateTimerId = _self->startTimer(1000);
         });
     }
 }
@@ -375,6 +378,29 @@ void MainController::stopDataRecording()
     stream << static_cast<qint32>(messageType);
 
     _mainChannel->sendMessage(byteArray);
+}
+
+void MainController::timerEvent(QTimerEvent *e) {
+    if (e->timerId() == _bitrateUpdateTimerId) {
+        /*****************************************
+         * This timer regularly updates the total bitrate count,
+         * and also broadcasts it to slave mission controls since they
+         * cannot calculate video bitrate
+         */
+        quint64 bpsRoverDown = 0, bpsRoverUp = 0;
+        bpsRoverUp += _mainVideoClient->getBitrate();
+        bpsRoverUp += _aux1VideoClient->getBitrate();
+        bpsRoverUp += _audioClient->getBitrate();
+        bpsRoverUp += _mainChannel->getBitsPerSecondDown();
+        bpsRoverDown += _mainChannel->getBitsPerSecondUp();
+        bpsRoverUp += _driveSystem->getChannel()->getBitsPerSecondDown();
+        bpsRoverDown += _driveSystem->getChannel()->getBitsPerSecondUp();
+
+        _controlWindow->updateBitrate(bpsRoverUp, bpsRoverDown);
+    }
+    else {
+        QObject::timerEvent(e);
+    }
 }
 
 void MainController::toggleDataRecording()
@@ -598,7 +624,7 @@ void MainController::onMainChannelMessageReceived(const char *message, Channel::
         QByteArray data;
         stream >> data;
         // This raw data should be sent to an MbedParser to be decoded
-        _sensorDataSeries->newData(data.data(), data.length());
+        _sensorDataSeries->newData(data.constData(), data.length());
         break;
     }
     case MainMessageType_StartDataRecording: {

@@ -31,6 +31,7 @@ MediaStreamer::~MediaStreamer() {
 void MediaStreamer::stop() {
     if (_pipeline) {
         LOG_I(LOG_TAG, "stop(): setting pipeline to StateNull");
+        _pipeline->bus()->removeSignalWatch();
         _pipeline->setState(QGst::StateNull);
         _pipeline.clear();
     }
