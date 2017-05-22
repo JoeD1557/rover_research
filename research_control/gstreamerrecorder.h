@@ -2,6 +2,7 @@
 #define GSTREAMERRECORDER_H
 
 #include <QObject>
+#include <QDateTime>
 
 #include "soro_core/gstreamerutil.h"
 #include "soro_core/socketaddress.h"
@@ -18,7 +19,7 @@ class GStreamerRecorder : public QObject
 public:
     explicit GStreamerRecorder(SocketAddress mediaAddress, QString name, QObject *parent=0);
 
-    void begin(quint8 codec, qint64 timestamp);
+    bool begin(quint8 codec, QDateTime startTime, bool vaapiDecode, bool vaapiEncode);
     void stop();
 
 private Q_SLOTS:

@@ -51,11 +51,8 @@ private:
     VideoClient *_mainVideoClient = 0;
     VideoClient *_aux1VideoClient = 0;
 
-    // Video recorders
-    GStreamerRecorder *_stereoLGStreamerRecorder = 0;
-    GStreamerRecorder *_stereoRGStreamerRecorder = 0;
-    GStreamerRecorder *_monoGStreamerRecorder = 0;
-    GStreamerRecorder *_aux1GStreamerRecorder = 0;
+    // Video recorder
+    GStreamerRecorder *_gstreamerRecorder = 0;
 
     // Audio stream subsystem
     AudioClient *_audioClient = 0;

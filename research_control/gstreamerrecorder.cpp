@@ -14,9 +14,39 @@ GStreamerRecorder::GStreamerRecorder(SocketAddress mediaAddress, QString name, Q
     _mediaAddress = mediaAddress;
 }
 
-void GStreamerRecorder::begin(quint8 codec, qint64 timestamp)
+bool GStreamerRecorder::begin(quint8 codec, QDateTime startTime, bool vaapiDecode, bool vaapiEncode)
 {
-    //TODO
+    stop();
+
+    QString filePath = QCoreApplication::applicationDirPath() + "/../research_media";
+
+     if (!QDir(filePath).exists())
+     {
+        LOG_I(LOG_TAG, filePath + " directory does not exist, creating it");
+        if (!QDir().mkpath(filePath))
+        {
+            LOG_E(LOG_TAG, "Cannot create " + filePath + " directory, video cannot be recorded");
+            return false;
+        }
+    }
+
+    filePath += "/" + startTime.toString("M-dd_h.mm.ss_AP") + ".avi";
+
+    QString binStr = GStreamerUtil::createRtpVideoFileSaveString(_mediaAddress.host, _mediaAddress.port,
+                                                                 codec,
+                                                                 filePath,
+                                                                 true,
+                                                                 "",
+                                                                 vaapiDecode, vaapiEncode);
+
+    LOG_I(LOG_TAG, "Starting gstreamer recording with bin string " + binStr);
+    _pipeline = QGst::Pipeline::create();
+    _pipeline->bus()->addSignalWatch();
+    QGlib::connect(_pipeline->bus(), "message", this, &GStreamerRecorder::onBusMessage);
+
+    _bin = QGst::Bin::fromDescription(binStr);
+    _pipeline->add(_bin);
+    _pipeline->setState(QGst::StatePlaying);
 }
 
 void GStreamerRecorder::stop()

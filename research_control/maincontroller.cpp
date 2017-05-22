@@ -179,6 +179,11 @@ void MainController::init(QApplication *app)
             connect(_self->_gamepad, &GamepadManager::gamepadChanged,
                     _self->_driveSystem, &DriveControlSystem::gamepadChanged);
 
+            connect(_self->_mainChannel, &Channel::stateChanged,
+                    _self->_connectionEventSeries, &ConnectionEventCsvSeries::mainChannelStateChanged);
+            connect(_self->_driveSystem->getChannel(), &Channel::stateChanged,
+                    _self->_connectionEventSeries, &ConnectionEventCsvSeries::driveChannelStateChanged);
+
             _self->_mainChannel->open();
             _self->_driveSystem->enable();
 
@@ -193,9 +198,9 @@ void MainController::init(QApplication *app)
 
             // Add localhost bounce to video streams so they can be recorded and played at the same time
             _self->_mainVideoClient->addForwardingAddress(SocketAddress(QHostAddress::LocalHost, NETWORK_ALL_MAIN_CAMERA_PORT));
-            _self->_mainVideoClient->addForwardingAddress(SocketAddress(QHostAddress::LocalHost, NETWORK_MC_MAIN_CAMERA_REC_PORT));
+            _self->_mainVideoClient->addForwardingAddress(SocketAddress(QHostAddress::LocalHost, NETWORK_MC_CAMERA_REC_PORT));
             _self->_aux1VideoClient->addForwardingAddress(SocketAddress(QHostAddress::LocalHost, NETWORK_ALL_AUX1_CAMERA_PORT));
-            _self->_aux1VideoClient->addForwardingAddress(SocketAddress(QHostAddress::LocalHost, NETWORK_MC_AUX1_CAMERA_REC_PORT));
+            _self->_aux1VideoClient->addForwardingAddress(SocketAddress(QHostAddress::LocalHost, NETWORK_MC_CAMERA_REC_PORT));
 
             connect(_self->_mainVideoClient, &VideoClient::stateChanged, _self, &MainController::onVideoClientStateChanged);
             connect(_self->_aux1VideoClient, &VideoClient::stateChanged, _self, &MainController::onVideoClientStateChanged);
@@ -207,6 +212,8 @@ void MainController::init(QApplication *app)
             connect(_self->_audioClient, &AudioClient::stateChanged, _self, &MainController::onAudioClientStateChanged);
 
             _self->_audioPlayer = new AudioPlayer(_self);
+
+            _self->_gstreamerRecorder = new GStreamerRecorder(SocketAddress(QHostAddress::LocalHost, NETWORK_MC_CAMERA_REC_PORT), "", _self);
 
             //
             // Initialize data recording system
@@ -240,11 +247,6 @@ void MainController::init(QApplication *app)
             _self->_dataRecorder->addColumn(_self->_latencyDataSeries->getRealLatencySeries());
             _self->_dataRecorder->addColumn(_self->_latencyDataSeries->getSimulatedLatencySeries());
             _self->_dataRecorder->addColumn(_self->_commentDataSeries);
-
-            connect(_self->_mainChannel, &Channel::stateChanged,
-                    _self->_connectionEventSeries, &ConnectionEventCsvSeries::mainChannelStateChanged);
-            connect(_self->_driveSystem->getChannel(), &Channel::stateChanged,
-                    _self->_connectionEventSeries, &ConnectionEventCsvSeries::driveChannelStateChanged);
 
             //
             // Initialize QML engine and register custom items
@@ -425,6 +427,7 @@ void MainController::onVideoClientStateChanged(MediaClient *client, MediaClient:
             _mainWindow->setSideBySideStereo(false);
             _settings.enableStereoVideo = false;
             _controlWindow->updateFromSettingsModel(&_settings);
+            _gstreamerRecorder->begin(profile.codec, QDateTime::currentDateTime(), _settings.useVaapiDecodeForCodec.value(profile.codec, false), false);
         }
             break;
         case VideoClient::ConnectingState: {
@@ -433,8 +436,10 @@ void MainController::onVideoClientStateChanged(MediaClient *client, MediaClient:
             _mainWindow->setSideBySideStereo(false);
             _settings.enableStereoVideo = false;
             _controlWindow->updateFromSettingsModel(&_settings);
+            _gstreamerRecorder->stop();
         }
             break;
+        default: break;
         }
     }
     else if (client == _mainVideoClient)
@@ -447,6 +452,7 @@ void MainController::onVideoClientStateChanged(MediaClient *client, MediaClient:
             _mainWindow->setSideBySideStereo(_mainVideoClient->getIsStereo());
             _settings.enableStereoVideo = _mainVideoClient->getIsStereo();
             _controlWindow->updateFromSettingsModel(&_settings);
+            _gstreamerRecorder->begin(profile.codec, QDateTime::currentDateTime(), _settings.useVaapiDecodeForCodec.value(profile.codec, false), false);
         }
             break;
         case VideoClient::ConnectingState: {
@@ -455,8 +461,10 @@ void MainController::onVideoClientStateChanged(MediaClient *client, MediaClient:
             _mainWindow->setSideBySideStereo(false);
             _settings.enableStereoVideo = false;
             _controlWindow->updateFromSettingsModel(&_settings);
+            _gstreamerRecorder->stop();
         }
             break;
+        default: break;
         }
     }
 }
@@ -479,8 +487,7 @@ void MainController::onAudioClientStateChanged(MediaClient *client, MediaClient:
         _settings.enableAudio = false;
         _controlWindow->updateFromSettingsModel(&_settings);
         break;
-    default:
-        break;
+    default: break;
     }
 }
 
