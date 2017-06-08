@@ -44,6 +44,7 @@ public:
 
 private:
     float rollToDegrees(float roll, float rollZero);
+    float rollToDegreesAccel(float roll, float rollZero);
 
     float _frontRollZero;
     float _rearRollZero;

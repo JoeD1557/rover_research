@@ -93,12 +93,6 @@ void MainController::init(QApplication *app)
                 }
                 _self->_settings.useVaapiEncodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_H264, value);
 
-                if (!config.valueAsBool("vaapi_enc_mpeg2", &value))
-                {
-                    panic(LOG_TAG, "Invalid value specified for vaapi_enc_mpeg2 in research_control.conf");
-                }
-                _self->_settings.useVaapiEncodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_MPEG2, value);
-
                 if (!config.valueAsBool("vaapi_enc_mjpeg", &value))
                 {
                     panic(LOG_TAG, "Invalid value specified for vaapi_enc_mjpeg in research_control.conf");
@@ -122,12 +116,6 @@ void MainController::init(QApplication *app)
                     panic(LOG_TAG, "Invalid value specified for vaapi_dec_h264 in research_control.conf");
                 }
                 _self->_settings.useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_H264, value);
-
-                if (!config.valueAsBool("vaapi_dec_mpeg2", &value))
-                {
-                    panic(LOG_TAG, "Invalid value specified for vaapi_dec_mpeg2 in research_control.conf");
-                }
-                _self->_settings.useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_MPEG2, value);
 
                 if (!config.valueAsBool("vaapi_dec_mjpeg", &value))
                 {
@@ -233,6 +221,9 @@ void MainController::init(QApplication *app)
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuRearYawSeries());
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuRearPitchSeries());
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuRearRollSeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuMiddleYawSeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuMiddlePitchSeries());
+            _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuMiddleRollSeries());
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuFrontYawSeries());
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuFrontPitchSeries());
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuFrontRollSeries());

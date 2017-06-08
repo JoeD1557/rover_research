@@ -27,12 +27,17 @@ ApplicationWindow {
     property alias frontPitch: hudOrientationSide.frontPitch
     property alias rearPitchZero: hudOrientationSide.rearPitchZero
     property alias frontPitchZero: hudOrientationSide.frontPitchZero
+    property alias middlePitch: hudOrientationSide.middlePitch
+    property alias middlePitchZero: hudOrientationSide.middlePitchZero
+    property alias middleRoll: hudOrientationBack.middleRoll
+    property alias middleRollZero: hudOrientationBack.middleRollZero
     property alias wheelFLPower: hudPower.wheelFLPower
     property alias wheelFRPower: hudPower.wheelFRPower
     property alias wheelMLPower: hudPower.wheelMLPower
     property alias wheelMRPower: hudPower.wheelMRPower
     property alias wheelBLPower: hudPower.wheelBLPower
     property alias wheelBRPower: hudPower.wheelBRPower
+    property alias compassHeading: hudCompass.compassHeading
 
     property bool stereo: false
     property bool hudVisible: true
@@ -66,6 +71,17 @@ ApplicationWindow {
     Item {
         id: overlayItem
         anchors.fill: parent
+
+        HudCompass {
+            id: hudCompass
+            x: stereo ? overlayItem.width / 4 - width / 2 : overlayItem.width / 2 - width / 2
+            y: 0
+            width: parent.height * 0.15
+            height: width
+            halfWidth: stereo
+            visible: hudVisible
+            enabled: visible
+        }
 
         HudPower {
             id: hudPower
@@ -116,7 +132,17 @@ ApplicationWindow {
         }
 
 
-
+        HudCompass {
+            id: hudCompass2
+            x: overlayItem.width / 4 * 3 - width / 2
+            y: 0
+            compassHeading: hudCompass.compassHeading
+            width: parent.height * 0.15
+            height: width
+            halfWidth: true
+            visible: hudVisible && stereo
+            enabled: visible
+        }
 
         HudPower {
             id: hudPower2

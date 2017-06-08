@@ -13,12 +13,11 @@ namespace Soro {
 namespace GStreamerUtil {
 
 const quint8 VIDEO_CODEC_H264 = 0;
-const quint8 VIDEO_CODEC_MPEG2 = 1;
-const quint8 VIDEO_CODEC_MPEG4 = 2;
-const quint8 VIDEO_CODEC_VP8 = 3;
-const quint8 VIDEO_CODEC_VP9 = 4;
-const quint8 VIDEO_CODEC_H265 = 5;
-const quint8 VIDEO_CODEC_MJPEG = 6;
+const quint8 VIDEO_CODEC_MPEG4 = 1;
+const quint8 VIDEO_CODEC_VP8 = 2;
+const quint8 VIDEO_CODEC_VP9 = 3;
+const quint8 VIDEO_CODEC_H265 = 4;
+const quint8 VIDEO_CODEC_MJPEG = 5;
 
 const quint8 AUDIO_CODEC_AC3 = 100;
 
@@ -32,6 +31,7 @@ struct SORO_CORE_EXPORT VideoProfile
     quint16 framerate;
     quint32 bitrate;
     quint8 mjpeg_quality;
+    bool grayscale;
 
     VideoProfile();
     VideoProfile(QString description);

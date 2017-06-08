@@ -22,15 +22,15 @@ public:
     static const char DATATAG_WHEELPOWER_D = 'D';
     static const char DATATAG_WHEELPOWER_E = 'E';
     static const char DATATAG_WHEELPOWER_F = 'F';
-    static const char DATATAG_IMUDATA_REAR_YAW = 'X';
-    static const char DATATAG_IMUDATA_REAR_PITCH = 'Y';
-    static const char DATATAG_IMUDATA_REAR_ROLL = 'Z';
+    static const char DATATAG_IMUDATA_REAR_YAW = 'L';
+    static const char DATATAG_IMUDATA_REAR_PITCH = 'J';
+    static const char DATATAG_IMUDATA_REAR_ROLL = 'K';
     static const char DATATAG_IMUDATA_FRONT_YAW = 'P';
     static const char DATATAG_IMUDATA_FRONT_PITCH = 'Q';
     static const char DATATAG_IMUDATA_FRONT_ROLL = 'R';
-    static const char DATATAG_IMUDATA_MIDDLE_YAW = 'J';
-    static const char DATATAG_IMUDATA_MIDDLE_PITCH = 'K';
-    static const char DATATAG_IMUDATA_MIDDLE_ROLL = 'L';
+    static const char DATATAG_IMUDATA_MIDDLE_YAW = 'X';
+    static const char DATATAG_IMUDATA_MIDDLE_PITCH = 'Y';
+    static const char DATATAG_IMUDATA_MIDDLE_ROLL = 'Z';
     static const char DATATAG_ERROR = '?';
 
     class WheelPowerACsvSeries : public CsvDataSeries { friend class SensorDataParser;

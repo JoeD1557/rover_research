@@ -43,6 +43,7 @@ void ControlWindowController::updateSettingsModel(SettingsModel *model) const
     model->enableAudio = _window->property("enableAudio").toBool();
     model->enableGps = _window->property("enableGps").toBool();
     model->selectedVideoEncoding = _window->property("selectedVideoEncoding").toInt();
+    model->selectedVideoGrayscale = _window->property("selectedVideoGrayscale").toBool();
     model->selectedVideoWidth = _window->property("selectedVideoWidth").toInt();
     model->selectedVideoHeight = _window->property("selectedVideoHeight").toInt();
     model->selectedVideoFramerate = _window->property("selectedVideoFramerate").toInt();
@@ -71,6 +72,7 @@ void ControlWindowController::updateFromSettingsModel(const SettingsModel *model
     _window->setProperty("enableAudio", model->enableAudio);
     _window->setProperty("enableGps", model->enableGps);
     _window->setProperty("selectedVideoEncoding", model->selectedVideoEncoding);
+    _window->setProperty("selectedVideoGrayscale", model->selectedVideoGrayscale);
     _window->setProperty("selectedVideoWidth", model->selectedVideoWidth);
     _window->setProperty("selectedVideoHeight", model->selectedVideoHeight);
     _window->setProperty("selectedVideoFramerate", model->selectedVideoFramerate);

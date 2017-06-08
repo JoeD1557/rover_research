@@ -53,6 +53,7 @@ ApplicationWindow {
     property alias hudParallaxSpinBox: hudParallaxSpinBox
     property alias activeCameraCombo: activeCameraCombo
     property alias videoEncodingCombo: videoEncodingCombo
+    property alias grayscaleVideoSwitch: grayscaleVideoSwitch
     property alias stereoVideoSwitch: stereoVideoSwitch
     property alias enableAudioSwitch: enableAudioSwitch
     property alias enableVideoSwitch: enableVideoSwitch
@@ -81,6 +82,7 @@ ApplicationWindow {
     property alias enableHud: enableHudSwitch.checked
     property alias selectedCamera: activeCameraCombo.currentIndex
     property alias selectedVideoEncoding: videoEncodingCombo.currentIndex
+    property alias selectedVideoGrayscale: grayscaleVideoSwitch.checked
     property alias selectedVideoWidth: videoWidthSpinBox.value
     property alias selectedVideoHeight: videoHeightSpinBox.value
     property alias selectedVideoFramerate: videoFramerateSpinBox.value
@@ -956,12 +958,33 @@ ApplicationWindow {
                     }
 
                     Switch {
+                        id: grayscaleVideoSwitch
+                        y: 96
+                        text: checked ? "Grayscale On" : "Grayscale Off"
+                        anchors.left: grayscaleVideoLabel.right
+                        anchors.leftMargin: 12
+                        anchors.top: videoFramerateSpinBox.bottom
+                        anchors.topMargin: 8
+                        onCheckedChanged: settingsFooterPane.state = "visible"
+                    }
+
+                    Label {
+                        id: grayscaleVideoLabel
+                        y: 77
+                        width: 100
+                        text: "Grayscale Video"
+                        anchors.verticalCenter: grayscaleVideoSwitch.verticalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: 0
+                    }
+
+                    Switch {
                         id: stereoVideoSwitch
                         text: checked ? "Stereo On" : "Stereo Off"
                         enabled: enableVideoSwitch.enabled & enableVideoSwitch.checked
                         anchors.left: stereoVideoLabel.right
                         anchors.leftMargin: 12
-                        anchors.top: videoFramerateSpinBox.bottom
+                        anchors.top: grayscaleVideoSwitch.bottom
                         anchors.topMargin: 8
                         onCheckedChanged: settingsFooterPane.state = "visible"
                     }

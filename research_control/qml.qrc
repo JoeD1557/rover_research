@@ -13,5 +13,6 @@
         <file>qml/HudOrientationSide.qml</file>
         <file>qml/HudOrientationBack.qml</file>
         <file>qml/MainWindow.qml</file>
+        <file>qml/HudCompass.qml</file>
     </qresource>
 </RCC>

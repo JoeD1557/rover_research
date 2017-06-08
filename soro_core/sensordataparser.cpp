@@ -31,7 +31,6 @@ void SensorDataParser::newData(const char* data, int len)
 
 void SensorDataParser::parseBuffer()
 {
-    qDebug() << _buffer;
     if (_buffer.length() < 4) return; // 4  is the size of a complete data point
 
     char tag = _buffer.at(0);
@@ -87,17 +86,17 @@ void SensorDataParser::parseBuffer()
             _imuFrontRollSeries.update(QVariant(data));
             break;
         case DATATAG_IMUDATA_MIDDLE_YAW:
-            _imuFrontYawSeries.update(QVariant(data));
+            _imuMiddleYawSeries.update(QVariant(data));
             break;
         case DATATAG_IMUDATA_MIDDLE_PITCH:
             // P: [ 100 - 800 ] -> [ -90, 90 ]
             //data = (data - 100) * (180/800) - 90;
-            _imuFrontPitchSeries.update(QVariant(data));
+            _imuMiddlePitchSeries.update(QVariant(data));
             break;
         case DATATAG_IMUDATA_MIDDLE_ROLL:
             // R: [ 100 - 900 ] -> [ -180, 180 ]
             //data = (data - 100) * (360/800) - 180;
-            _imuFrontRollSeries.update(QVariant(data));
+            _imuMiddleRollSeries.update(QVariant(data));
             break;
         default:
             // Something went wrong trying to parse

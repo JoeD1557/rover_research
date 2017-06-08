@@ -30,6 +30,7 @@ SettingsModel::SettingsModel()
     selectedVideoWidth = 640;
     selectedVideoHeight = 480;
     selectedVideoBitrate = 500;
+    selectedVideoGrayscale = false;
     selectedVideoFramerate = 0;
     selectedMjpegQuality = 50;
     selectedCamera = 0;
@@ -43,22 +44,21 @@ SettingsModel::SettingsModel()
     cameraNames << "Main Camera [Mono/Stereo]";   mainCameraIndex = 0;
     cameraNames << "Fisheye Camera [Mono]";       aux1CameraIndex = 1;
 
-    videoEncodingNames << "MP4";
-    videoEncodingNames << "MJPEG";
     videoEncodingNames << "H264";
+    videoEncodingNames << "MPEG4";
     videoEncodingNames << "VP8";
+    videoEncodingNames << "VP9";
     videoEncodingNames << "H265";
+    videoEncodingNames << "MJPEG";
 
     useVaapiEncodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_H264, false);
     useVaapiEncodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_MPEG4, false);
-    useVaapiEncodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_MPEG2, false);
     useVaapiEncodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_H265, false);
     useVaapiEncodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_MJPEG, false);
     useVaapiEncodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_VP8, false);
 
     useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_H264, false);
     useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_MPEG4, false);
-    useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_MPEG2, false);
     useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_H265, false);
     useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_MJPEG, false);
     useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_VP8, false);
@@ -77,6 +77,7 @@ GStreamerUtil::VideoProfile SettingsModel::getSelectedVideoProfile()
     profile.framerate = selectedVideoFramerate;
     profile.mjpeg_quality = selectedMjpegQuality;
     profile.width = selectedVideoWidth;
+    profile.grayscale = selectedVideoGrayscale;
     profile.height = selectedVideoHeight;
     return profile;
 }

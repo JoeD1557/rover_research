@@ -23,6 +23,7 @@ struct SettingsModel {
     int selectedVideoEncoding;
     int selectedVideoWidth;
     int selectedVideoHeight;
+    bool selectedVideoGrayscale;
     int selectedVideoFramerate;
     int selectedVideoBitrate;
     int selectedMjpegQuality;

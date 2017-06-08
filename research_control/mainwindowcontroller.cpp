@@ -68,6 +68,7 @@ void MainWindowController::playVideo(SocketAddress address, GStreamerUtil::Video
 
     // create a udpsrc to receive the stream
     QString binStr = GStreamerUtil::createRtpVideoDecodeString(address.host, address.port, profile.codec, vaapi);
+    LOG_I(LOG_TAG, "Starting video surface with bin string " + binStr);
 
     // create a gstreamer bin from the description
     QGst::BinPtr source = QGst::Bin::fromDescription(binStr);
@@ -167,6 +168,9 @@ void MainWindowController::onSensorUpdate(char tag, int value)
         break;
     case SensorDataParser::DATATAG_IMUDATA_MIDDLE_ROLL:
         _window->setProperty("middleRoll", value);
+        break;
+    case SensorDataParser::DATATAG_IMUDATA_FRONT_YAW:
+        _window->setProperty("compassHeading", (value - 100) * 360.0f / 800.0f);
         break;
     }
 }

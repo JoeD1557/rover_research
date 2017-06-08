@@ -26,13 +26,14 @@ VideoProfile::VideoProfile()
     height = 480;
     framerate = 30;
     bitrate = 2048000;
+    grayscale = false;
     mjpeg_quality = 50;
 }
 
 VideoProfile::VideoProfile(QString description)
 {
     QStringList items = description.split(',');
-    if ((items[0] == "VP") && (items.size() == 7))
+    if ((items[0] == "VP") && (items.size() == 8))
     {
         codec = items[1].toUInt();
         width = items[2].toUInt();
@@ -40,6 +41,7 @@ VideoProfile::VideoProfile(QString description)
         framerate = items[4].toUInt();
         bitrate = items[5].toUInt();
         mjpeg_quality = items[6].toUInt();
+        grayscale = items[7] == "g";
     }
     else
     {
@@ -49,6 +51,7 @@ VideoProfile::VideoProfile(QString description)
         framerate = 30;
         bitrate = 2048000;
         mjpeg_quality = 50;
+        grayscale = false;
     }
 }
 
@@ -69,13 +72,14 @@ AudioProfile::AudioProfile(QString description)
 
 QString VideoProfile::toString() const
 {
-    return QString("VP,%1,%2,%3,%4,%5,%6")
+    return QString("VP,%1,%2,%3,%4,%5,%6,%7")
             .arg(QString::number(codec),
                  QString::number(width),
                  QString::number(height),
                  QString::number(framerate),
                  QString::number(bitrate),
-                 QString::number(mjpeg_quality));
+                 QString::number(mjpeg_quality),
+                 grayscale ? "g" : "c");
 }
 
 bool VideoProfile::operator==(const VideoProfile& other) const
@@ -115,9 +119,9 @@ QString createRtpAlsaEncodeString(quint16 bindPort,  QHostAddress address, quint
 QString createRtpV4L2EncodeString(QString cameraDevice, quint16 bindPort, QHostAddress address, quint16 port, VideoProfile profile, bool vaapi)
 {
     return QString("v4l2src device=/dev/%1 ! "
-                   "videoconvert ! "
+                   "video/x-raw,framerate=30/1 ! "
                    "videoscale method=0 add-borders=true ! "
-                   "videorate drop-only=true ! "
+                   "videorate ! "
                    "%2")
             .arg(cameraDevice,
                  createRtpVideoEncodeString(bindPort, address, port, profile, vaapi));
@@ -126,9 +130,9 @@ QString createRtpV4L2EncodeString(QString cameraDevice, quint16 bindPort, QHostA
 QString createRtpStereoV4L2EncodeString(QString leftCameraDevice, QString rightCameraDevice, quint16 bindPort, QHostAddress address, quint16 port, VideoProfile profile, bool vaapi)
 {
     return QString("v4l2src device=/dev/%5 ! "
-                   "videoconvert ! "
+                   "video/x-raw,framerate=30/1 ! "
                    "videoscale method=0 add-borders=true ! "
-                   "videorate drop-only=true ! "
+                   "videorate ! "
                    "video/x-raw,width=%1,height=%2,framerate=%3/1 ! "
                    "videoscale method=0 add-borders=false ! "
                    "video/x-raw,width=%4,height=%2 ! "
@@ -136,9 +140,9 @@ QString createRtpStereoV4L2EncodeString(QString leftCameraDevice, QString rightC
                    "videomixer name=mix background=black ! "
                    "%7 "
                    "v4l2src device=/dev/%6 ! "
-                   "videoconvert ! "
+                   "video/x-raw,framerate=30/1 ! "
                    "videoscale method=0 add-borders=true ! "
-                   "videorate drop-only=true ! "
+                   "videorate ! "
                    "video/x-raw,width=%1,height=%2,framerate=%3/1 ! "
                    "videoscale method=0 add-borders=false ! "
                    "video/x-raw,width=%4,height=%2 ! "
@@ -154,11 +158,14 @@ QString createRtpStereoV4L2EncodeString(QString leftCameraDevice, QString rightC
 
 QString createRtpVideoEncodeString(quint16 bindPort, QHostAddress address, quint16 port, VideoProfile profile, bool vaapi)
 {
-    return QString("video/x-raw,format=I420,width=%1,height=%2,framerate=%3/1 ! "
-                   "%4 ! "
+    return QString("%1 ! "
+                   "video/x-raw,format=I420,width=%2,height=%3,framerate=%4/1 ! "
                    "%5 ! "
-                   "udpsink bind-port=%6 host=%7 port=%8")
-            .arg(QString::number(profile.width),
+                   "%6 ! "
+                   "udpsink bind-port=%7 host=%8 port=%9")
+            .arg(profile.grayscale ? "videoconvert ! video/x-raw,format=GRAY8 ! videoconvert"
+                                   : "videoconvert",
+                 QString::number(profile.width),
                  QString::number(profile.height),
                  QString::number(profile.framerate),
                  getVideoEncodeElement(profile, vaapi),
@@ -335,7 +342,6 @@ QString getVideoEncodeElement(VideoProfile profile, bool vaapi)
         case VIDEO_CODEC_MPEG4:
             return QString("avenc_mpeg4 bitrate=%1")
                     .arg(QString::number(profile.bitrate));
-            break;
         case VIDEO_CODEC_H264:
             return QString("x264enc speed-preset=ultrafast tune=zerolatency bitrate=%1")
                     .arg(QString::number(profile.bitrate / 1000)); // Bitrate wanted in kbit/sec

@@ -22,7 +22,7 @@ namespace Soro {
 HudOrientationSideImpl::HudOrientationSideImpl(QQuickItem *parent): AbstractHudOrientationImpl(parent)
 {
     _frontPitch = _frontPitchZero = 400;
-    _rearPitch = _rearPitchZero = 400;
+    _rearPitch = _rearPitchZero = 575;
     _middlePitch = _middlePitchZero = 400;
 }
 
@@ -48,8 +48,8 @@ void HudOrientationSideImpl::paint(QPainter *painter)
 
     QPointF backCenter, middleCenter, frontCenter;
 
-    backCenter.setX(width() / 2 - cos(degToRad(pitchToDegrees(_rearPitch, _rearPitchZero))) * (width() / 2 - wheelSize / 2));
-    backCenter.setY(width() / 2 - sin(degToRad(pitchToDegrees(_rearPitch, _rearPitchZero))) * (width() / 2 - wheelSize / 2));
+    backCenter.setX(width() / 2 - cos(degToRad(pitchToDegrees(_middlePitch, _middlePitchZero))) * (width() / 2 - wheelSize / 2));
+    backCenter.setY(width() / 2 - sin(degToRad(pitchToDegrees(_middlePitch, _middlePitchZero))) * (width() / 2 - wheelSize / 2));
 
     frontCenter.setX(width() / 2 + cos(degToRad(pitchToDegrees(_frontPitch, _frontPitchZero))) * (width() / 2 - wheelSize / 2));
     frontCenter.setY(width() / 2 + sin(degToRad(pitchToDegrees(_frontPitch, _frontPitchZero))) * (width() / 2 - wheelSize / 2));

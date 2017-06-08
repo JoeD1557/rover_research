@@ -30,9 +30,15 @@ float HudOrientationBackImpl::rollToDegrees(float roll, float rollZero)
     return 1.5 * -((roll - (rollZero - 500) - 100.0) * (180.0/800.0) - 90.0);
 }
 
+float HudOrientationBackImpl::rollToDegreesAccel(float roll, float rollZero)
+{
+    return 4* -((roll - (rollZero - 500) - 100.0) * (180.0/800.0) - 90.0);
+}
+
 void HudOrientationBackImpl::paint(QPainter *painter)
 {
     painter->setRenderHint(QPainter::Antialiasing);
+
 
     //
     // Draw FRONT wheels
@@ -116,12 +122,15 @@ void HudOrientationBackImpl::paint(QPainter *painter)
     rPath2.closeSubpath();
     painter->fillPath(rPath2, QBrush(QColor("#00C853")));
 
+
+
+
     //
     // Draw BACK wheels
     //
     painter->resetTransform();
     painter->translate(width() / 2, height() / 2);
-    painter->rotate(rollToDegrees(_rearRoll, _rearRollZero));
+    painter->rotate(rollToDegreesAccel(_rearRoll, _rearRollZero));  //_middleRoll, _middleRollZero
 
     QPen pen;
     pen.setColor(QColor("#2962FF"));
