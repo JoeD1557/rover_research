@@ -46,6 +46,9 @@ void AudioServer::constructChildArguments(QStringList& outArgs, quint16 bindPort
     outArgs << QString::number(address.port);
     outArgs << QString::number(bindPort);
     outArgs << QString::number(ipcPort);
+
+    QString binString = GStreamerUtil::createRtpAlsaEncodeString(bindPort, address.host, address.port, _profile);
+    LOG_I(LOG_TAG, "Child is about to start using gstreamer bin string " + binString);
 }
 
 void AudioServer::constructStreamingMessage(QDataStream& stream) {

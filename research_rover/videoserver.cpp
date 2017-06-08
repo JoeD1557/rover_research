@@ -67,6 +67,28 @@ void VideoServer::constructChildArguments(QStringList& outArgs, quint16 bindPort
     outArgs << QString::number(address.port);
     outArgs << QString::number(bindPort);
     outArgs << QString::number(ipcPort);
+
+    QString binString;
+    if (_stereo)
+    {
+        binString = GStreamerUtil::createRtpStereoV4L2EncodeString(_videoDevice.mid(0, _videoDevice.indexOf(",")),
+                                                             _videoDevice.mid(_videoDevice.indexOf(",") + 1),
+                                                             bindPort,
+                                                             address.host,
+                                                             address.port,
+                                                             _profile,
+                                                             _vaapi);
+    }
+    else
+    {
+        binString = GStreamerUtil::createRtpV4L2EncodeString(_videoDevice,
+                                                             bindPort,
+                                                             address.host,
+                                                             address.port,
+                                                             _profile,
+                                                             _vaapi);
+    }
+    LOG_I(LOG_TAG, "Child is about to start using gstreamer bin string " + binString);
 }
 
 void VideoServer::constructStreamingMessage(QDataStream& stream) {
