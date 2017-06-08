@@ -315,7 +315,7 @@ QString getVideoEncodeElement(VideoProfile profile, bool vaapi)
             // No VAAPI encoder for these formats
             return getVideoEncodeElement(profile, false);
         case VIDEO_CODEC_H264:
-            return QString("vaapih264ency bitrate=%1")
+            return QString("vaapih264enc bitrate=%1")
                     .arg(QString::number(profile.bitrate / 1000)); // Bitrate wanted in kbit/sec
         case VIDEO_CODEC_MJPEG:
             return QString("vaapijpegenc bitrate=%1 quality=%2")
