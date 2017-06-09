@@ -86,6 +86,7 @@ void MediaServer::stop() {
     }
     if (_child.state() != QProcess::NotRunning) {
         LOG_I(LOG_TAG, "stop(): Asking the streaming process to stop");
+        disconnect(&_child, &QProcess::stateChanged, this, &MediaServer::childStateChanged);
         if (_ipcSocket) {
             _ipcSocket->write("stop");
             _ipcSocket->flush();
