@@ -307,6 +307,11 @@ void MainController::init(QApplication *app)
             connect(_self->_commentsWindow, &CommentsWindowController::closed,
                     _self, &MainController::onWindowClosed);
 
+            connect(_self->_mainWindow, &MainWindowController::gstreamerError, _self, [](QString message)
+            {
+               _self->_controlWindow->notify(NotificationType_Error, "Error Decoding Video", "Received an error decoding video: " + message);
+            });
+
             connect(_self->_mainChannel, &Channel::stateChanged,
                     _self->_commentsWindow, &CommentsWindowController::setConnectionState);
 

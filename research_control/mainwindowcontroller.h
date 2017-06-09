@@ -37,6 +37,7 @@ public:
 
 Q_SIGNALS:
     void closed();
+    void gstreamerError(QString message);
 
 public Q_SLOTS:
     void onLatencyChanged(int latency);

@@ -159,6 +159,7 @@ void ControlWindowController::setConnectionState(Channel::State state)
     case Channel::ConnectingState:
         _window->setProperty("connectionState", "connecting");
         break;
+    case Channel::ReadyState: break;
     }
 }
 
@@ -183,6 +184,7 @@ void ControlWindowController::setDriveConnectionState(Channel::State state)
                "The network connection to the rover's drive system is not available.");
         setMbedStatus("Unknown");
         break;
+    case Channel::ReadyState: break;
     }
 }
 

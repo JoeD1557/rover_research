@@ -103,7 +103,25 @@ void MainWindowController::stopVideo()
 
 void MainWindowController::onBusMessage(const QGst::MessagePtr &message)
 {
- // TODO
+    switch (message->type()) {
+    case QGst::MessageEos:
+        LOG_E(LOG_TAG, "onBusMessage(): Received EOS message from gstreamer");
+        Q_EMIT gstreamerError("Received unexpected EOS message");
+        break;
+    case QGst::MessageError: {
+        QString msg = message.staticCast<QGst::ErrorMessage>()->debugMessage();
+        LOG_E(LOG_TAG, "onBusMessage(): Received error message from gstreamer '" + msg + "'");
+        Q_EMIT gstreamerError(msg);
+        break;
+    }
+    case QGst::MessageInfo: {
+        QString msg = message.staticCast<QGst::InfoMessage>()->debugMessage();
+        LOG_I(LOG_TAG, "onBusMessage(): Received info message from gstreamer '" + msg + "'");
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void MainWindowController::onZeroHudOrientationClicked()
