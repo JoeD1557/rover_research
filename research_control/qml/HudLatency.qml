@@ -137,7 +137,7 @@ Item {
         Text {
             id: latencyText
             anchors.centerIn: parent
-            font.pointSize: parent.width / 8
+            font.pointSize: Math.max(parent.width / 8, 1)
             text: "Delay<br><b>N/A</b>"
             horizontalAlignment: Text.AlignHCenter
             color: "white"
