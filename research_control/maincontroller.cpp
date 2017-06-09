@@ -272,6 +272,8 @@ void MainController::init(QApplication *app)
             connect(_self->_mainChannel, &Channel::rttChanged,
                     _self->_mainWindow, &MainWindowController::onLatencyChanged);
             connect(_self->_mainChannel, &Channel::rttChanged,
+                    _self->_latencyDataSeries, &LatencyCsvSeries::updateRealLatency);
+            connect(_self->_mainChannel, &Channel::rttChanged,
                     _self->_controlWindow, &ControlWindowController::onLatencyChanged);
             connect(_self->_controlWindow, &ControlWindowController::requestUiSync,
                     _self, &MainController::onRequestUiSync);
