@@ -197,16 +197,14 @@ QString createRtpVideoDecodeString(QHostAddress address, quint16 port, quint8 co
     return createRtpDepayString(address, port, codec) + " ! " + getVideoDecodeElement(codec) + " ! videoconvert ! video/x-raw,format=RGB ! videoconvert";
 }
 
-QString createRtpVideoFileSaveString(QHostAddress address, quint16 port, quint8 codec, QString filePath, bool timeOverlay, QString textOverlay, bool encodeVaapi)
+QString createRtpVideoFileSaveString(QHostAddress address, quint16 port, quint8 codec, QString filePath, bool timeOverlay, bool encodeVaapi)
 {
-    QString bin = createRtpDepayString(address, port, codec) + " ! " + getVideoDecodeElement(codec) + " ! videoconvert ! video/x-raw,format=I420 ! ";
+    QString bin = createRtpDepayString(address, port, codec)
+            + " ! " + getVideoDecodeElement(codec)
+            + " ! videoconvert ! videoscale method=0 add-borders=true ! videorate ! video/x-raw,format=I420,width=1920,height=1080,framerate=30/1 ! ";
     if (timeOverlay)
     {
         bin += "timeoverlay halignment=center valignment=top ! ";
-    }
-    if (!textOverlay.isEmpty())
-    {
-        bin += QString("textoverlay text=\"%1\" halignment=center valignment=bottom ! ").arg(textOverlay);
     }
 
     VideoProfile encodeProfile;

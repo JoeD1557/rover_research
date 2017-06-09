@@ -36,8 +36,7 @@ bool GStreamerRecorder::begin(quint8 codec, QDateTime startTime, bool vaapiEncod
                                                                  codec,
                                                                  filePath,
                                                                  true,
-                                                                 "",
-                                                                 vaapiEncode);
+                                                                 false);
 
     LOG_I(LOG_TAG, "Starting gstreamer recording with bin string " + binStr);
     _pipeline = QGst::Pipeline::create();

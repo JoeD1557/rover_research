@@ -71,8 +71,6 @@ void MainController::init(QApplication *app)
 
             LOG_I(LOG_TAG, "Reading settings...");
 
-            _self->_settings = SettingsModel();
-
             QFile confFile(QCoreApplication::applicationDirPath() + "/../config/research_control.conf");
             if (!confFile.exists()) {
                 panic(LOG_TAG, "The configuration file ../config/research_control.conf does not exist.");

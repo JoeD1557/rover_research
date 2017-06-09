@@ -90,7 +90,7 @@ QString createRtpVideoDecodeString(QHostAddress address, quint16 port, quint8 co
  * re-encodes it as an H264 video file at the specifed location. If desired, a timestamp and/or custom text can be
  * overlaid on the video.
  */
-QString createRtpVideoFileSaveString(QHostAddress address, quint16 port, quint8 codec, QString filePath, bool timeOverlay, QString textOverlay, bool encodeVaapi=false);
+QString createRtpVideoFileSaveString(QHostAddress address, quint16 port, quint8 codec, QString filePath, bool timeOverlay, bool encodeVaapi=false);
 
 /* Creates a pipeline string that outputs a video test pattern
  */
