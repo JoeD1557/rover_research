@@ -3,10 +3,10 @@ QT += core network
 CONFIG += c++11 no_keywords
 CONFIG += console
 CONFIG -= app_bundle
-TARGET = research_rover
+TARGET = rover
 TEMPLATE = app
 
-BUILD_DIR = ../build/research_rover
+BUILD_DIR = ../build/rover
 DESTDIR = ../bin
 OBJECTS_DIR = $$BUILD_DIR
 MOC_DIR = $$BUILD_DIR
