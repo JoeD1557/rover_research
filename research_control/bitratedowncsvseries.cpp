@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-#include <QCoreApplication>
+#include "bitratedowncsvseries.h"
 
-#include "maincontroller.h"
+namespace Soro {
 
-using namespace Soro;
+BitrateDownCsvSeries::BitrateDownCsvSeries(QObject *parent) : QObject(parent) { }
 
-int main(int argc, char *argv[])
+QString BitrateDownCsvSeries::getSeriesName() const
 {
-    QCoreApplication a(argc, argv);
-
-    MainController::init(&a);
-
-    return a.exec();
+    return "Bitrate To Rover (b/s)";
 }
+
+void BitrateDownCsvSeries::bitrateUpdate(int bpsDown)
+{
+    update(QVariant(bpsDown));
+}
+
+bool BitrateDownCsvSeries::shouldKeepOldValues() const
+{
+    return true;
+}
+
+} // namespace Soro

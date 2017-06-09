@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 The University of Oklahoma.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "maincontroller.h"
 #include "soro_core/logger.h"
 #include "soro_core/constants.h"
@@ -182,6 +198,8 @@ void MainController::init(QApplication *app)
             _self->_connectionEventSeries = new ConnectionEventCsvSeries(_self);
             _self->_latencyDataSeries = new LatencyCsvSeries(_self);
             _self->_commentDataSeries = new CommentCsvSeries(_self);
+            _self->_bitrateUpDataSeries = new BitrateUpCsvSeries(_self);
+            _self->_bitrateDownDataSeries = new BitrateDownCsvSeries(_self);
 
             _self->_dataRecorder = new CsvRecorder(_self);
             _self->_dataRecorder->setUpdateInterval(50);
@@ -204,6 +222,8 @@ void MainController::init(QApplication *app)
             _self->_dataRecorder->addColumn(_self->_gpsDataSeries->getLatitudeSeries());
             _self->_dataRecorder->addColumn(_self->_gpsDataSeries->getLongitudeSeries());
             _self->_dataRecorder->addColumn(_self->_connectionEventSeries);
+            _self->_dataRecorder->addColumn(_self->_bitrateUpDataSeries);
+            _self->_dataRecorder->addColumn(_self->_bitrateDownDataSeries);
             _self->_dataRecorder->addColumn(_self->_latencyDataSeries->getRealLatencySeries());
             _self->_dataRecorder->addColumn(_self->_latencyDataSeries->getSimulatedLatencySeries());
             _self->_dataRecorder->addColumn(_self->_commentDataSeries);
@@ -366,6 +386,8 @@ void MainController::timerEvent(QTimerEvent *e) {
         bpsRoverUp += _driveSystem->getChannel()->getBitsPerSecondDown();
         bpsRoverDown += _driveSystem->getChannel()->getBitsPerSecondUp();
 
+        _bitrateUpDataSeries->bitrateUpdate(bpsRoverUp);
+        _bitrateDownDataSeries->bitrateUpdate(bpsRoverDown);
         _controlWindow->updateBitrate(bpsRoverUp, bpsRoverDown);
     }
     else {

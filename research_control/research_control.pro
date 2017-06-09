@@ -35,7 +35,9 @@ SOURCES += main.cpp \
     audioclient.cpp \
     qmlgstreamerglitem.cpp \
     qmlgstreamerpainteditem.cpp \
-    camerasettingsmodel.cpp
+    camerasettingsmodel.cpp \
+    bitrateupcsvseries.cpp \
+    bitratedowncsvseries.cpp
 
 HEADERS  += \
     settingsmodel.h \
@@ -60,7 +62,9 @@ HEADERS  += \
     controlwindowcontroller.h \
     maincontroller.h \
     commentswindowcontroller.h \
-    camerasettingsmodel.h
+    camerasettingsmodel.h \
+    bitrateupcsvseries.h \
+    bitratedowncsvseries.h
 
 RESOURCES += \
     qml.qrc \

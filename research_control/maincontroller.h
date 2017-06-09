@@ -22,6 +22,8 @@
 #include "audioclient.h"
 #include "audioplayer.h"
 #include "videoclient.h"
+#include "bitratedowncsvseries.h"
+#include "bitrateupcsvseries.h"
 #include "gstreamerrecorder.h"
 
 namespace Soro {
@@ -65,6 +67,8 @@ private:
     ConnectionEventCsvSeries *_connectionEventSeries = 0;
     LatencyCsvSeries *_latencyDataSeries = 0;
     CommentCsvSeries *_commentDataSeries = 0;
+    BitrateUpCsvSeries *_bitrateUpDataSeries = 0;
+    BitrateDownCsvSeries *_bitrateDownDataSeries = 0;
     CsvRecorder *_dataRecorder = 0;
 
     int _bitrateUpdateTimerId;
