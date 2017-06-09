@@ -7,7 +7,7 @@ killall research_rover
 
 cd ~
 
-if [ ! -f rover_research ]; then
+if [ ! -d rover_research ]; then
 	git clone http://github.com/doublejinitials/rover_research
 fi
 
@@ -18,7 +18,7 @@ git reset --hard origin/master
 
 cd ~
 
-if [ ! -f build_rover_research ]; then
+if [ ! -d build_rover_research ]; then
 	mkdir build_rover_research
 fi
 
