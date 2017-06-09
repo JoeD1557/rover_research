@@ -75,8 +75,8 @@ ApplicationWindow {
         HudCompass {
             id: hudCompass
             x: stereo ? overlayItem.width / 4 - width / 2 : overlayItem.width / 2 - width / 2
-            y: 0
-            width: parent.height * 0.15
+            y: 12
+            width: parent.height * 0.12
             height: width
             halfWidth: stereo
             visible: hudVisible
@@ -135,9 +135,9 @@ ApplicationWindow {
         HudCompass {
             id: hudCompass2
             x: overlayItem.width / 4 * 3 - width / 2
-            y: 0
+            y: 12
             compassHeading: hudCompass.compassHeading
-            width: parent.height * 0.15
+            width: parent.height * 0.12
             height: width
             halfWidth: true
             visible: hudVisible && stereo
