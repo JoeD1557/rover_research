@@ -64,11 +64,6 @@ SettingsModel::SettingsModel()
     useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_VP8, false);
 }
 
-void SettingsModel::setSelectedCamera(int mediaId)
-{
-    // TODO
-}
-
 GStreamerUtil::VideoProfile SettingsModel::getSelectedVideoProfile()
 {
     GStreamerUtil::VideoProfile profile;

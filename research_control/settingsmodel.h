@@ -44,7 +44,6 @@ struct SettingsModel {
     QStringList videoEncodingNames;
     GStreamerUtil::AudioProfile defaultAudioFormat;
 
-    void setSelectedCamera(int mediaId);
     GStreamerUtil::VideoProfile getSelectedVideoProfile();
 };
 
