@@ -42,6 +42,7 @@ MainWindowController::~MainWindowController()
 
 void MainWindowController::resetPipeline()
 {
+    LOG_I(LOG_TAG, "Resetting gstreamer pipeline");
     if (!_pipeline.isNull())
     {
         QGlib::disconnect(_pipeline->bus(), "message", this, &MainWindowController::onBusMessage);

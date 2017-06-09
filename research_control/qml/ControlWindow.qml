@@ -937,8 +937,9 @@ ApplicationWindow {
                     SpinBox {
                         id: videoFramerateSpinBox
                         enabled: enableVideoSwitch.enabled & enableVideoSwitch.checked
+                        from: 1
                         to: 30
-                        value: 0
+                        value: 30
                         stepSize: 1
                         anchors.left: videoFramerateLabel.right
                         anchors.leftMargin: 12

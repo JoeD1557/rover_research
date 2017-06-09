@@ -31,7 +31,7 @@ SettingsModel::SettingsModel()
     selectedVideoHeight = 480;
     selectedVideoBitrate = 500;
     selectedVideoGrayscale = false;
-    selectedVideoFramerate = 0;
+    selectedVideoFramerate = 30;
     selectedMjpegQuality = 50;
     selectedCamera = 0;
     selectedLatency = 0;
