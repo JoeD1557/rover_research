@@ -43,45 +43,57 @@ void HudOrientationSideImpl::paint(QPainter *painter)
     int wheelSize = height() / 4;
 
     QPen pen;
-    pen.setColor(Qt::white);
-    pen.setWidth(height() / 40);
+    pen.setWidth(height() / 30);
 
-    QPointF backCenter, middleCenter, frontCenter;
+    // Transform for rear components
+    painter->resetTransform();
+    painter->translate(width() / 2, height() / 2);
+    painter->rotate(pitchToDegrees(_middlePitch, _middlePitchZero));
 
-    backCenter.setX(width() / 2 - cos(degToRad(pitchToDegrees(_middlePitch, _middlePitchZero))) * (width() / 2 - wheelSize / 2));
-    backCenter.setY(width() / 2 - sin(degToRad(pitchToDegrees(_middlePitch, _middlePitchZero))) * (width() / 2 - wheelSize / 2));
+    // Draw mast
+    pen.setColor(QColor("#00C853"));
+    QPainterPath mastPath;
+    mastPath.moveTo(-width() / 2 + wheelSize / 2, 0);
+    mastPath.lineTo(-width() / 2 + wheelSize / 4, -height() / 3);
+    painter->strokePath(mastPath, pen);
 
-    frontCenter.setX(width() / 2 + cos(degToRad(pitchToDegrees(_frontPitch, _frontPitchZero))) * (width() / 2 - wheelSize / 2));
-    frontCenter.setY(width() / 2 + sin(degToRad(pitchToDegrees(_frontPitch, _frontPitchZero))) * (width() / 2 - wheelSize / 2));
+    // Draw rear frame
+    pen.setColor(QColor("#00C853"));
+    QPainterPath rearFramePath;
+    rearFramePath.moveTo(0, 0);
+    rearFramePath.lineTo(-width() / 3 + wheelSize / 4, -height() / 6);
+    rearFramePath.lineTo(-width() / 2 + wheelSize / 2, 0);
+    painter->strokePath(rearFramePath, pen);
 
-    middleCenter.setX(width() / 2);
-    middleCenter.setY(height() / 2);
-
-    // Draw connecting line from back to middle wheel
-    QPainterPath bmPath;
-    bmPath.moveTo(backCenter.x(), backCenter.y());
-    bmPath.lineTo(middleCenter.x(), middleCenter.y());
-    painter->strokePath(bmPath, pen);
-
-    // Draw connecting line from middle to front wheel
-    QPainterPath mfPath;
-    mfPath.moveTo(middleCenter.x(), middleCenter.y());
-    mfPath.lineTo(frontCenter.x(), frontCenter.y());
-    painter->strokePath(mfPath, pen);
-
+    // Draw back wheels
     painter->setPen(Qt::NoPen);
-
-    // Draw back wheel
     painter->setBrush(QBrush(QColor("#2962FF")));
-    painter->drawEllipse(QRectF(backCenter.x() - wheelSize / 2, backCenter.y() - wheelSize / 2, wheelSize, wheelSize));
+    painter->drawEllipse(QRectF(-width() / 2, -wheelSize / 2, wheelSize, wheelSize));
 
-    // Draw middle wheel
-    painter->setBrush(QBrush(QColor("#00C853")));
-    painter->drawEllipse(QRectF(middleCenter.x() - wheelSize / 2, middleCenter.y() - wheelSize / 2, wheelSize, wheelSize));
+    // Transform for front components
+    painter->resetTransform();
+    painter->translate(width() / 2, height() / 2);
+    painter->rotate(pitchToDegrees(_frontPitch, _frontPitchZero));
+
+    // Draw front frame
+    pen.setColor(QColor("#d50000"));
+    QPainterPath frontFramePath;
+    frontFramePath.moveTo(0, 0);
+    frontFramePath.lineTo(width() / 6 - wheelSize / 4, -height() / 6);
+    frontFramePath.lineTo(width() / 2 - wheelSize / 2, 0);
+    painter->strokePath(frontFramePath, pen);
 
     // Draw front wheel
+    painter->setPen(Qt::NoPen);
     painter->setBrush(QBrush(QColor("#d50000")));
-    painter->drawEllipse(QRectF(frontCenter.x() - wheelSize / 2, frontCenter.y() - wheelSize / 2, wheelSize, wheelSize));
+    painter->drawEllipse(QRectF(width() / 2 - wheelSize,  -wheelSize / 2, wheelSize, wheelSize));
+
+    // Draw middle wheel
+    painter->resetTransform();
+    painter->translate(width() / 2, height() / 2);
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(QBrush(QColor("#00C853")));
+    painter->drawEllipse(QRectF(-wheelSize / 2, -wheelSize / 2, wheelSize, wheelSize));
 }
 
 void HudOrientationSideImpl::setFrontPitch(float frontPitch)
