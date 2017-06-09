@@ -52,7 +52,7 @@ void MainWindowController::resetPipeline()
     }
 }
 
-void MainWindowController::playVideo(SocketAddress address, GStreamerUtil::VideoProfile profile, bool vaapi)
+void MainWindowController::playVideo(SocketAddress address, GStreamerUtil::VideoProfile profile)
 {
     resetPipeline();
 
@@ -68,7 +68,7 @@ void MainWindowController::playVideo(SocketAddress address, GStreamerUtil::Video
     QGlib::connect(_pipeline->bus(), "message", this, &MainWindowController::onBusMessage);
 
     // create a udpsrc to receive the stream
-    QString binStr = GStreamerUtil::createRtpVideoDecodeString(address.host, address.port, profile.codec, vaapi);
+    QString binStr = GStreamerUtil::createRtpVideoDecodeString(address.host, address.port, profile.codec);
     LOG_I(LOG_TAG, "Starting video surface with bin string " + binStr);
 
     // create a gstreamer bin from the description

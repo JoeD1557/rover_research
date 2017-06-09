@@ -56,12 +56,6 @@ SettingsModel::SettingsModel()
     useVaapiEncodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_H265, false);
     useVaapiEncodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_MJPEG, false);
     useVaapiEncodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_VP8, false);
-
-    useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_H264, false);
-    useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_MPEG4, false);
-    useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_H265, false);
-    useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_MJPEG, false);
-    useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_VP8, false);
 }
 
 GStreamerUtil::VideoProfile SettingsModel::getSelectedVideoProfile()

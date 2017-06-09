@@ -111,30 +111,6 @@ void MainController::init(QApplication *app)
                 }
                 _self->_settings.useVaapiEncodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_VP8, value);
 
-                if (!config.valueAsBool("vaapi_dec_h264", &value))
-                {
-                    panic(LOG_TAG, "Invalid value specified for vaapi_dec_h264 in research_control.conf");
-                }
-                _self->_settings.useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_H264, value);
-
-                if (!config.valueAsBool("vaapi_dec_mjpeg", &value))
-                {
-                    panic(LOG_TAG, "Invalid value specified for vaapi_dec_mjpeg in research_control.conf");
-                }
-                _self->_settings.useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_MJPEG, value);
-
-                if (!config.valueAsBool("vaapi_dec_h265", &value))
-                {
-                    panic(LOG_TAG, "Invalid value specified for vaapi_dec_h265 in research_control.conf");
-                }
-                _self->_settings.useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_H265, value);
-
-                if (!config.valueAsBool("vaapi_dec_vp8", &value))
-                {
-                    panic(LOG_TAG, "Invalid value specified for vaapi_dec_vp8 in research_control.conf");
-                }
-                _self->_settings.useVaapiDecodeForCodec.insert(GStreamerUtil::VIDEO_CODEC_VP8, value);
-
                 if (!config.valueAsBool("gst_hwrender", &_self->_settings.useHwRendering))
                 {
                     panic(LOG_TAG, "Invalid value specified for gst_hwrender in research_control.conf");
@@ -453,12 +429,12 @@ void MainController::onVideoClientStateChanged(MediaClient *client, MediaClient:
         switch (state) {
         case VideoClient::StreamingState: {
             GStreamerUtil::VideoProfile profile = _aux1VideoClient->getVideoProfile();
-            _mainWindow->playVideo(SocketAddress(QHostAddress::LocalHost, NETWORK_ALL_AUX1_CAMERA_PORT), profile, _settings.useVaapiDecodeForCodec.value(profile.codec, false));
+            _mainWindow->playVideo(SocketAddress(QHostAddress::LocalHost, NETWORK_ALL_AUX1_CAMERA_PORT), profile);
             _settings.enableVideo = true;
             _mainWindow->setSideBySideStereo(false);
             _settings.enableStereoVideo = false;
             _controlWindow->updateFromSettingsModel(&_settings);
-            _gstreamerRecorder->begin(profile.codec, QDateTime::currentDateTime(), _settings.useVaapiDecodeForCodec.value(profile.codec, false), false);
+            _gstreamerRecorder->begin(profile.codec, QDateTime::currentDateTime(), false);
         }
             break;
         default: {
@@ -478,12 +454,12 @@ void MainController::onVideoClientStateChanged(MediaClient *client, MediaClient:
         switch (state) {
         case VideoClient::StreamingState: {
             GStreamerUtil::VideoProfile profile = _mainVideoClient->getVideoProfile();
-            _mainWindow->playVideo(SocketAddress(QHostAddress::LocalHost, NETWORK_ALL_MAIN_CAMERA_PORT), profile, _settings.useVaapiDecodeForCodec.value(profile.codec, false));
+            _mainWindow->playVideo(SocketAddress(QHostAddress::LocalHost, NETWORK_ALL_MAIN_CAMERA_PORT), profile);
             _settings.enableVideo = true;
             _mainWindow->setSideBySideStereo(_mainVideoClient->getIsStereo());
             _settings.enableStereoVideo = _mainVideoClient->getIsStereo();
             _controlWindow->updateFromSettingsModel(&_settings);
-            _gstreamerRecorder->begin(profile.codec, QDateTime::currentDateTime(), _settings.useVaapiDecodeForCodec.value(profile.codec, false), false);
+            _gstreamerRecorder->begin(profile.codec, QDateTime::currentDateTime(), false);
         }
             break;
         default: {

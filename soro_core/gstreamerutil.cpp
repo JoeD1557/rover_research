@@ -192,14 +192,14 @@ QString createRtpAudioDecodeString(QHostAddress address, quint16 port, quint8 co
     return createRtpDepayString(address, port, codec) + " ! " + getAudioDecodeElement(codec);
 }
 
-QString createRtpVideoDecodeString(QHostAddress address, quint16 port, quint8 codec, bool vaapi)
+QString createRtpVideoDecodeString(QHostAddress address, quint16 port, quint8 codec)
 {
-    return createRtpDepayString(address, port, codec) + " ! " + getVideoDecodeElement(codec, vaapi) + " ! videoconvert ! video/x-raw,format=RGB ! videoconvert";
+    return createRtpDepayString(address, port, codec) + " ! " + getVideoDecodeElement(codec) + " ! videoconvert ! video/x-raw,format=RGB ! videoconvert";
 }
 
-QString createRtpVideoFileSaveString(QHostAddress address, quint16 port, quint8 codec, QString filePath, bool timeOverlay, QString textOverlay, bool decodeVaapi, bool encodeVaapi)
+QString createRtpVideoFileSaveString(QHostAddress address, quint16 port, quint8 codec, QString filePath, bool timeOverlay, QString textOverlay, bool encodeVaapi)
 {
-    QString bin = createRtpDepayString(address, port, codec) + " ! " + getVideoDecodeElement(codec, decodeVaapi) + " ! videoconvert ! video/x-raw,format=I420 ! ";
+    QString bin = createRtpDepayString(address, port, codec) + " ! " + getVideoDecodeElement(codec) + " ! videoconvert ! video/x-raw,format=I420 ! ";
     if (timeOverlay)
     {
         bin += "timeoverlay halignment=center valignment=top ! ";
@@ -361,11 +361,8 @@ QString getVideoEncodeElement(VideoProfile profile, bool vaapi)
     }
 }
 
-QString getVideoDecodeElement(quint8 codec, bool vaapi)
+QString getVideoDecodeElement(quint8 codec)
 {
-    // Single decode element for all VAAPI codecs
-    if (vaapi) return "vaapidecode";
-
     switch (codec)
     {
     case VIDEO_CODEC_MPEG4:

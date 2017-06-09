@@ -14,7 +14,7 @@ GStreamerRecorder::GStreamerRecorder(SocketAddress mediaAddress, QString name, Q
     _mediaAddress = mediaAddress;
 }
 
-bool GStreamerRecorder::begin(quint8 codec, QDateTime startTime, bool vaapiDecode, bool vaapiEncode)
+bool GStreamerRecorder::begin(quint8 codec, QDateTime startTime, bool vaapiEncode)
 {
     stop();
 
@@ -37,7 +37,7 @@ bool GStreamerRecorder::begin(quint8 codec, QDateTime startTime, bool vaapiDecod
                                                                  filePath,
                                                                  true,
                                                                  "",
-                                                                 vaapiDecode, vaapiEncode);
+                                                                 vaapiEncode);
 
     LOG_I(LOG_TAG, "Starting gstreamer recording with bin string " + binStr);
     _pipeline = QGst::Pipeline::create();

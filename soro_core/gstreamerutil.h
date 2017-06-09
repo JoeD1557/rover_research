@@ -84,13 +84,13 @@ QString createRtpAudioEncodeString(quint16 bindPort, QHostAddress address, quint
 
 /* Creates a pipeline string that accepts an RTP video stream on a UDP port, and decodes it from the specified codec to a raw video stream
  */
-QString createRtpVideoDecodeString(QHostAddress address, quint16 port, quint8 codec, bool vaapi=false);
+QString createRtpVideoDecodeString(QHostAddress address, quint16 port, quint8 codec);
 
 /* Creates a pipeline string that accepts an RTP video stream on a UDP port, and decodes it from the specified codec and
  * re-encodes it as an H264 video file at the specifed location. If desired, a timestamp and/or custom text can be
  * overlaid on the video.
  */
-QString createRtpVideoFileSaveString(QHostAddress address, quint16 port, quint8 codec, QString filePath, bool timeOverlay, QString textOverlay, bool decodeVaapi=false, bool encodeVaapi=false);
+QString createRtpVideoFileSaveString(QHostAddress address, quint16 port, quint8 codec, QString filePath, bool timeOverlay, QString textOverlay, bool encodeVaapi=false);
 
 /* Creates a pipeline string that outputs a video test pattern
  */
@@ -119,7 +119,7 @@ QString getRtpPayElement(quint8 codec);
 
 /* Gets the element name and associated options to decode the specified video profile
  */
-QString getVideoDecodeElement(quint8 codec, bool vaapi=false);
+QString getVideoDecodeElement(quint8 codec);
 
 /* Gets the element name and associated options to encode the specified video profile
  */

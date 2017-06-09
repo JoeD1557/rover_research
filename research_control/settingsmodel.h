@@ -38,7 +38,6 @@ struct SettingsModel {
     QHostAddress roverAddress;
     bool useHwRendering;
     QHash<quint8, bool> useVaapiEncodeForCodec;
-    QHash<quint8, bool> useVaapiDecodeForCodec;
 
     QStringList cameraNames;
     QStringList videoEncodingNames;

@@ -32,7 +32,7 @@ public:
     bool getSideBySideStereo() const;
     QGst::ElementPtr getVideoSink();
     DriveGamepadMode getDriveGamepadMode() const;
-    void playVideo(SocketAddress address, GStreamerUtil::VideoProfile profile, bool vaapi);
+    void playVideo(SocketAddress address, GStreamerUtil::VideoProfile profile);
     void stopVideo();
 
 Q_SIGNALS:

@@ -19,7 +19,7 @@ class GStreamerRecorder : public QObject
 public:
     explicit GStreamerRecorder(SocketAddress mediaAddress, QString name, QObject *parent=0);
 
-    bool begin(quint8 codec, QDateTime startTime, bool vaapiDecode, bool vaapiEncode);
+    bool begin(quint8 codec, QDateTime startTime, bool vaapiEncode);
     void stop();
 
 private Q_SLOTS:
