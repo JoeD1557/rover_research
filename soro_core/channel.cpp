@@ -628,12 +628,12 @@ void Channel::processBufferedMessage(MessageType type, MessageID ID, const char 
     case MSGTYPE_ACK:
         LOG_D(LOG_TAG, "Received ack packet " + QString::number(ID));
         _lastReceiveTime = QDateTime::currentMSecsSinceEpoch();
-        int time = _lastReceiveTime - _lastAckReceiveTime;
+        float time = (_lastReceiveTime - _lastAckReceiveTime) / 1000.0f;
         _lastAckReceiveTime = _lastReceiveTime;
         if (time != 0)
         {
-            _dataRateUp = (_bytesUp * (100000 / time)) / 100;
-            _dataRateDown = (_bytesDown * (100000 / time)) / 100;
+            _dataRateUp = _bytesUp * 8 / time;
+            _dataRateDown = _bytesDown * 8 / time;
         }
         _bytesUp = 0;
         _bytesDown = 0;
