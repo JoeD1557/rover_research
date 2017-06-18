@@ -15,29 +15,29 @@ ApplicationWindow {
 
     property alias gstreamerSurface: gstreamerSurface
 
-    property alias latency: hudLatency.latency
-    property alias gamepadX: hudLatency.xValue
-    property alias gamepadY: hudLatency.yValue
-    property alias latencyTolerance: hudLatency.latencyTolerance
-    property alias rearRoll: hudOrientationBack.rearRoll
-    property alias frontRoll: hudOrientationBack.frontRoll
-    property alias rearRollZero: hudOrientationBack.rearRollZero
-    property alias frontRollZero: hudOrientationBack.frontRollZero
-    property alias rearPitch: hudOrientationSide.rearPitch
-    property alias frontPitch: hudOrientationSide.frontPitch
-    property alias rearPitchZero: hudOrientationSide.rearPitchZero
-    property alias frontPitchZero: hudOrientationSide.frontPitchZero
-    property alias middlePitch: hudOrientationSide.middlePitch
-    property alias middlePitchZero: hudOrientationSide.middlePitchZero
-    property alias middleRoll: hudOrientationBack.middleRoll
-    property alias middleRollZero: hudOrientationBack.middleRollZero
-    property alias wheelFLPower: hudPower.wheelFLPower
-    property alias wheelFRPower: hudPower.wheelFRPower
-    property alias wheelMLPower: hudPower.wheelMLPower
-    property alias wheelMRPower: hudPower.wheelMRPower
-    property alias wheelBLPower: hudPower.wheelBLPower
-    property alias wheelBRPower: hudPower.wheelBRPower
-    property alias compassHeading: hudCompass.compassHeading
+    property int latency: 0
+    property real gamepadX: 0
+    property real gamepadY: 0
+    property int latencyTolerance: 0
+    property real rearRoll: 500
+    property real frontRoll: 500
+    property real rearRollZero: 500
+    property real frontRollZero: 500
+    property real rearPitch: 575
+    property real frontPitch: 400
+    property real rearPitchZero: 575
+    property real frontPitchZero: 400
+    property real middlePitch: 400
+    property real middlePitchZero: 400
+    property real middleRoll: 500
+    property real middleRollZero: 500
+    property int wheelFLPower: 0
+    property int wheelFRPower: 0
+    property int wheelMLPower: 0
+    property int wheelMRPower: 0
+    property int wheelBLPower: 0
+    property int wheelBRPower: 0
+    property real compassHeading: 0
 
     property bool stereo: false
     property bool hudVisible: true
@@ -76,6 +76,7 @@ ApplicationWindow {
             id: hudCompass
             x: stereo ? overlayItem.width / 4 - width / 2 : overlayItem.width / 2 - width / 2
             y: 12
+            compassHeading: mainWindow.compassHeading
             width: parent.height * 0.12
             height: width
             halfWidth: stereo
@@ -86,6 +87,12 @@ ApplicationWindow {
         HudPower {
             id: hudPower
             blurSource: gstreamerSurface
+            wheelBLPower: mainWindow.wheelBLPower
+            wheelBRPower: mainWindow.wheelBRPower
+            wheelMLPower: mainWindow.wheelMLPower
+            wheelMRPower: mainWindow.wheelMRPower
+            wheelFLPower: mainWindow.wheelFLPower
+            wheelFRPower: mainWindow.wheelFRPower
             x: stereo ? hudParallax : 0
             y: 0
             width: height * 0.8
@@ -98,6 +105,12 @@ ApplicationWindow {
         HudOrientationSide {
             id: hudOrientationSide
             blurSource: gstreamerSurface
+            rearPitch: mainWindow.rearPitch
+            rearPitchZero: mainWindow.rearPitchZero
+            frontPitch: mainWindow.frontPitch
+            frontPitchZero: mainWindow.frontPitchZero
+            middlePitch: mainWindow.middlePitch
+            middlePitchZero: mainWindow.middlePitchZero
             x: stereo ? hudParallax : 0
             y: overlayItem.height - height
             width: height
@@ -110,6 +123,12 @@ ApplicationWindow {
         HudOrientationBack {
             id: hudOrientationBack
             blurSource: gstreamerSurface
+            rearRoll: mainWindow.rearRoll
+            rearRollZero: mainWindow.rearRollZero
+            frontRoll: mainWindow.frontRoll
+            frontRollZero: mainWindow.frontRollZero
+            middleRoll: mainWindow.middleRoll
+            middleRollZero: mainWindow.middleRollZero
             x: stereo ? overlayItem.width / 2 - width / 2 : overlayItem.width - width
             y: overlayItem.height - height
             width: height
@@ -122,6 +141,10 @@ ApplicationWindow {
         HudLatency {
             id: hudLatency
             blurSource: gstreamerSurface
+            latency: mainWindow.latency
+            latencyTolerance: mainWindow.latencyTolerance
+            xValue: mainWindow.gamepadX
+            yValue: mainWindow.gamepadY
             x: stereo ? overlayItem.width / 2 - width / 2 : overlayItem.width - width
             y: 0
             halfWidth: stereo
@@ -131,12 +154,11 @@ ApplicationWindow {
             enabled: visible
         }
 
-
         HudCompass {
             id: hudCompass2
             x: overlayItem.width / 4 * 3 - width / 2
             y: 12
-            compassHeading: hudCompass.compassHeading
+            compassHeading: mainWindow.compassHeading
             width: parent.height * 0.12
             height: width
             halfWidth: true
@@ -146,12 +168,12 @@ ApplicationWindow {
 
         HudPower {
             id: hudPower2
-            wheelBLPower: hudPower.wheelBLPower
-            wheelBRPower: hudPower.wheelBRPower
-            wheelMLPower: hudPower.wheelMLPower
-            wheelMRPower: hudPower.wheelMRPower
-            wheelFLPower: hudPower.wheelFLPower
-            wheelFRPower: hudPower.wheelFRPower
+            wheelBLPower: mainWindow.wheelBLPower
+            wheelBRPower: mainWindow.wheelBRPower
+            wheelMLPower: mainWindow.wheelMLPower
+            wheelMRPower: mainWindow.wheelMRPower
+            wheelFLPower: mainWindow.wheelFLPower
+            wheelFRPower: mainWindow.wheelFRPower
             blurSource: gstreamerSurface
             x: overlayItem.width / 2
             y: 0
@@ -164,12 +186,12 @@ ApplicationWindow {
 
         HudOrientationSide {
             id: hudOrientationSide2
-            rearPitch: hudOrientationSide.rearPitch
-            rearPitchZero: hudOrientationSide.rearPitchZero
-            frontPitch: hudOrientationSide.frontPitch
-            frontPitchZero: hudOrientationSide.frontPitchZero
-            middlePitch: hudOrientationSide.middlePitch
-            middlePitchZero: hudOrientationSide.middlePitchZero
+            rearPitch: mainWindow.rearPitch
+            rearPitchZero: mainWindow.rearPitchZero
+            frontPitch: mainWindow.frontPitch
+            frontPitchZero: mainWindow.frontPitchZero
+            middlePitch: mainWindow.middlePitch
+            middlePitchZero: mainWindow.middlePitchZero
             blurSource: gstreamerSurface
             x: overlayItem.width / 2
             y: overlayItem.height - height
@@ -182,12 +204,12 @@ ApplicationWindow {
 
         HudOrientationBack {
             id: hudOrientationBack2
-            rearRoll: hudOrientationBack.rearRoll
-            rearRollZero: hudOrientationBack.rearRollZero
-            frontRoll: hudOrientationBack.frontRoll
-            frontRollZero: hudOrientationBack.frontRollZero
-            middleRoll: hudOrientationBack.middleRoll
-            middleRollZero: hudOrientationBack.middleRollZero
+            rearRoll: mainWindow.rearRoll
+            rearRollZero: mainWindow.rearRollZero
+            frontRoll: mainWindow.frontRoll
+            frontRollZero: mainWindow.frontRollZero
+            middleRoll: mainWindow.middleRoll
+            middleRollZero: mainWindow.middleRollZero
             blurSource: gstreamerSurface
             x: overlayItem.width - width / 2 - hudParallax
             y: overlayItem.height - height;
@@ -200,10 +222,10 @@ ApplicationWindow {
 
         HudLatency {
             id: hudLatency2
-            latency: hudLatency.latency
-            latencyTolerance: hudLatency.latencyTolerance
-            xValue: hudLatency.xValue
-            yValue: hudLatency.yValue
+            latency: mainWindow.latency
+            latencyTolerance: mainWindow.latencyTolerance
+            xValue: mainWindow.gamepadX
+            yValue: mainWindow.gamepadY
             blurSource: gstreamerSurface
             x: overlayItem.width - width / 2 - hudParallax
             y: 0;

@@ -283,6 +283,8 @@ void MainController::init(QApplication *app)
                     _self->_mainWindow, &MainWindowController::onZeroHudOrientationClicked);
             connect(_self->_gamepad, &GamepadManager::gamepadChanged,
                     _self->_controlWindow, &ControlWindowController::onGamepadChanged);
+            connect(_self->_gamepad, &GamepadManager::poll,
+                    _self->_mainWindow, &MainWindowController::onGamepadUpdate);
             connect(_self->_mainChannel, &Channel::stateChanged,
                     _self->_controlWindow, &ControlWindowController::setConnectionState);
 
