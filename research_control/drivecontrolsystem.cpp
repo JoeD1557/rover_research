@@ -78,7 +78,7 @@ void DriveControlSystem::gamepadChanged(bool connected, QString name)
 void DriveControlSystem::timerEvent(QTimerEvent *e)
 {
     QObject::timerEvent(e);
-    if ((e->timerId() == _controlSendTimerId) && _channel && _gamepadConnected)
+    if ((e->timerId() == _controlSendTimerId) && _channel && _gamepadConnected && _gamepadState)
     {
         //send the rover a drive gamepad packet
         switch (_mode)

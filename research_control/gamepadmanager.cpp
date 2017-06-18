@@ -27,7 +27,7 @@ GamepadManager::GamepadManager(QObject *parent) : QObject(parent)
     if (SDL_Init(SDL_INIT_GAMECONTROLLER) == 0) {
 
         // Add gamepad map
-        QFile gamepadMap(":/libsoromc_assets/gcdb.txt"); // Loads from libsoromc_assets.qrc
+        QFile gamepadMap("qrc:/config/gcdb.txt"); // Loads from assets.qrc
         gamepadMap.open(QIODevice::ReadOnly);
         while (gamepadMap.bytesAvailable())
         {
