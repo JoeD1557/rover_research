@@ -31,7 +31,7 @@ public:
 
     };
 
-    explicit GamepadManager(QObject *parent = 0);
+    explicit GamepadManager(QString gcdbPath, QObject *parent = 0);
     ~GamepadManager();
 
     bool init(int interval, QString *error);

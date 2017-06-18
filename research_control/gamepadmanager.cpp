@@ -21,23 +21,23 @@
 
 namespace Soro {
 
-GamepadManager::GamepadManager(QObject *parent) : QObject(parent)
+GamepadManager::GamepadManager(QString gcdbPath, QObject *parent) : QObject(parent)
 {
     _interval = 50;
-    if (SDL_Init(SDL_INIT_GAMECONTROLLER) == 0) {
-
+    LOG_I(LOG_TAG, "Calling SDL::init...");
+    if (SDL_Init(SDL_INIT_GAMECONTROLLER) == 0)
+    {
         // Add gamepad map
-        QFile gamepadMap("qrc:/config/gcdb.txt"); // Loads from assets.qrc
-        gamepadMap.open(QIODevice::ReadOnly);
-        while (gamepadMap.bytesAvailable())
+        LOG_I(LOG_TAG, "Loading mappings from " + gcdbPath);
+        int mapCount = SDL_GameControllerAddMappingsFromFile(gcdbPath.toLocal8Bit().constData());
+        if (mapCount == -1)
         {
-            if (SDL_GameControllerAddMapping(gamepadMap.readLine().data()) == -1)
-            {
-                gamepadMap.close();
-                MainController::panic(LOG_TAG, "Unable to apply SDL gamepad map");
-            }
+            MainController::panic(LOG_TAG, QString("Unable to apply game controller map from %1.\n\nError: %2").arg(
+                                      gcdbPath,
+                                      SDL_GetError()));
         }
-        gamepadMap.close();
+        LOG_I(LOG_TAG, QString("Added mappings for %1 game controllers").arg(mapCount));
+
         START_TIMER(_inputSelectorTimerId, 1000);
     }
     else
@@ -82,8 +82,9 @@ void GamepadManager::timerEvent(QTimerEvent *e)
         {
             char guid_str[256];
             SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(i);
+            const char * name = SDL_JoystickNameForIndex(i);
             SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str));
-            LOG_I(LOG_TAG, QString("Considering joystick %1 with GUID %2...").arg(QString::number(i), QString(guid_str)));
+            LOG_I(LOG_TAG, QString("Considering joystick %1 (%2) with GUID %3...").arg(QString::number(i), name, QString(guid_str)));
             if (SDL_IsGameController(i))
             {
                 SDL_GameController *controller = SDL_GameControllerOpen(i);
@@ -94,7 +95,15 @@ void GamepadManager::timerEvent(QTimerEvent *e)
                     START_TIMER(_updateTimerId, _interval);
                     break;
                 }
+                else
+                {
+                    LOG_E(LOG_TAG, "Failed to open joystick " + QString::number(i));
+                }
                 SDL_GameControllerClose(controller);
+            }
+            else
+            {
+                LOG_I(LOG_TAG, QString("Joystick %1 is not a valid game controller").arg(QString::number(i)));
             }
         }
     }

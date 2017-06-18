@@ -136,7 +136,7 @@ void MainController::init(QApplication *app)
             //
 
             LOG_I(LOG_TAG, "Initializing gamepad manager...");
-            _self->_gamepad = new GamepadManager(_self);
+            _self->_gamepad = new GamepadManager(QCoreApplication::applicationDirPath() + "/../config/gamecontrollerdb.txt", _self);
 
             //
             // Initialize core connections

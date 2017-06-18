@@ -12,6 +12,5 @@
         <file>icons/ic_info_white_48px.svg</file>
         <file>html/map.html</file>
         <file>icons/ic_navigation_white_48px.svg</file>
-        <file>config/gcdb.txt</file>
     </qresource>
 </RCC>
