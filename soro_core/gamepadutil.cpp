@@ -30,6 +30,15 @@ short filterGamepadDeadzone(short raw, float percent)
     return raw;
 }
 
+float filterGamepadDeadzoneF(float raw, float percent)
+{
+    if (((raw > 0) && (raw < percent)) || ((raw < 0) && (raw > percent)))
+    {
+        return 0;
+    }
+    return raw;
+}
+
 char axisShortToAxisByte(short val)
 {
     val /= (SHRT_MAX / 100);

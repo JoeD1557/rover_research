@@ -22,6 +22,7 @@
 
 #include <QtMath>
 #include <climits>
+#include <QDebug>
 
 #include "drivemessage.h"
 #include "enums.h"
@@ -58,12 +59,13 @@ void setGamepadData_SingleStick(char *driveMessage, short XAxis, short YAxis,
 
     float y = GamepadUtil::axisShortToAxisFloat(YAxis);
     float x =  -GamepadUtil::axisShortToAxisFloat(XAxis);
+
     float right, left;
 
     // First hypotenuse
     float z = sqrt(x*x + y*y);
     // angle in radians
-    float rad = qAcos(qAbs(x)/z);
+    float rad = z != 0 ? qAcos(qAbs(x)/z) : 0;
     // and in degrees
     float angle = rad*180/3.1415926;
 
@@ -82,7 +84,9 @@ void setGamepadData_SingleStick(char *driveMessage, short XAxis, short YAxis,
     {
         left = move;
         right = turn;
-    } else {
+    }
+    else
+    {
         right = move;
         left = turn;
     }
@@ -100,10 +104,10 @@ void setGamepadData_SingleStick(char *driveMessage, short XAxis, short YAxis,
 
     float midScale = middleSkidSteerFactor * (qAbs(x)/1.0);
 
-    driveMessage[Index_LeftOuter] = GamepadUtil::axisFloatToAxisByte(GamepadUtil::filterGamepadDeadzone(left, 0.1));
-    driveMessage[Index_RightOuter] = GamepadUtil::axisFloatToAxisByte(GamepadUtil::filterGamepadDeadzone(right, 0.1));
-    driveMessage[Index_LeftMiddle] = GamepadUtil::axisFloatToAxisByte(GamepadUtil::filterGamepadDeadzone(left - (midScale * left), deadzone));
-    driveMessage[Index_RightMiddle] = GamepadUtil::axisFloatToAxisByte(GamepadUtil::filterGamepadDeadzone(right - (midScale * right), deadzone));
+    driveMessage[Index_LeftOuter] = GamepadUtil::axisFloatToAxisByte(GamepadUtil::filterGamepadDeadzoneF(left, deadzone));
+    driveMessage[Index_RightOuter] = GamepadUtil::axisFloatToAxisByte(GamepadUtil::filterGamepadDeadzoneF(right, deadzone));
+    driveMessage[Index_LeftMiddle] = GamepadUtil::axisFloatToAxisByte(GamepadUtil::filterGamepadDeadzoneF(left - (midScale * left), deadzone));
+    driveMessage[Index_RightMiddle] = GamepadUtil::axisFloatToAxisByte(GamepadUtil::filterGamepadDeadzoneF(right - (midScale * right), deadzone));
 }
 
 }

@@ -31,6 +31,7 @@ DriveControlSystem::DriveControlSystem(const QHostAddress& roverAddress, QObject
     {
         MainController::panic(LOG_TAG, "Could not open channel for drive control");
     }
+    _channel->open();
     _midSkidFactor = 0.2;
     _deadzone = 0.1;
     _gamepadConnected = false;
@@ -85,6 +86,7 @@ void DriveControlSystem::timerEvent(QTimerEvent *e)
         {
         case SingleStickDrive:
             DriveMessage::setGamepadData_SingleStick(_buffer, _gamepadState->axisLeftX, _gamepadState->axisLeftY, _midSkidFactor, _deadzone);
+            qDebug() << (int)_buffer[1] << " " << (int)_buffer[2] << " " << (int)_buffer[3] << " " << (int)_buffer[4];
             break;
         case DualStickDrive:
             DriveMessage::setGamepadData_DualStick(_buffer, _gamepadState->axisLeftY, _gamepadState->axisRightX, _midSkidFactor, _deadzone);

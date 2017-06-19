@@ -12,6 +12,7 @@ namespace GamepadUtil {
  * will return zero. Otherwise it returns the original value.
  */
 short filterGamepadDeadzone(short raw, float percent);
+float filterGamepadDeadzoneF(float raw, float percent);
 
 /* Converts a 16 bit signed integer ranging from -32768 to 32767
  * into an unsigned char, ranging from 0 to 200
