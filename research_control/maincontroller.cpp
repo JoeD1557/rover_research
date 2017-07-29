@@ -269,8 +269,9 @@ void MainController::init(QApplication *app)
 
             _self->_mainWindow->setDriveGamepadMode(_self->_driveSystem->getMode());
 
-            connect(_self->_mainChannel, &Channel::rttChanged,
-                    _self->_mainWindow, &MainWindowController::onLatencyChanged);
+            connect(_self->_mainChannel, &Channel::rttChanged, _self, [](int rtt) {
+                _self->_mainWindow->onLatencyChanged(rtt + _self->_settings.selectedLatency);
+            });
             connect(_self->_mainChannel, &Channel::rttChanged,
                     _self->_latencyDataSeries, &LatencyCsvSeries::updateRealLatency);
             connect(_self->_mainChannel, &Channel::rttChanged,
