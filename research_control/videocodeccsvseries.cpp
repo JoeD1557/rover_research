@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-#include "bitratedowncsvseries.h"
+#include "videocodeccsvseries.h"
+#include "soro_core/gstreamerutil.h"
 
 namespace Soro {
 
-BitrateDownCsvSeries::BitrateDownCsvSeries(QObject *parent) : CsvDataSeries(parent) { }
+VideoCodecCsvSeries::VideoCodecCsvSeries(QObject *parent) : CsvDataSeries(parent) { }
 
-QString BitrateDownCsvSeries::getSeriesName() const
+QString VideoCodecCsvSeries::getSeriesName() const
 {
-    return "Bitrate To Rover (b/s)";
+    return "Video Codec";
 }
 
-void BitrateDownCsvSeries::bitrateUpdate(int bpsDown)
+void VideoCodecCsvSeries::onSettingsChanged(const SettingsModel *settings)
 {
-    update(QVariant(bpsDown));
+    update(QVariant(GStreamerUtil::getCodecName(settings->selectedVideoEncoding)));
 }
 
-bool BitrateDownCsvSeries::shouldKeepOldValues() const
+bool VideoCodecCsvSeries::shouldKeepOldValues() const
 {
     return true;
 }

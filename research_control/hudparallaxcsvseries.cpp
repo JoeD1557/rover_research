@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-#include "bitratedowncsvseries.h"
+#include "hudparallaxcsvseries.h"
+#include "soro_core/gstreamerutil.h"
 
 namespace Soro {
 
-BitrateDownCsvSeries::BitrateDownCsvSeries(QObject *parent) : CsvDataSeries(parent) { }
+HudParallaxCsvSeries::HudParallaxCsvSeries(QObject *parent) : CsvDataSeries(parent) { }
 
-QString BitrateDownCsvSeries::getSeriesName() const
+QString HudParallaxCsvSeries::getSeriesName() const
 {
-    return "Bitrate To Rover (b/s)";
+    return "HUD Parallax";
 }
 
-void BitrateDownCsvSeries::bitrateUpdate(int bpsDown)
+void HudParallaxCsvSeries::onSettingsChanged(const SettingsModel *settings)
 {
-    update(QVariant(bpsDown));
+    update(QVariant(settings->selectedHudParallax));
 }
 
-bool BitrateDownCsvSeries::shouldKeepOldValues() const
+bool HudParallaxCsvSeries::shouldKeepOldValues() const
 {
     return true;
 }

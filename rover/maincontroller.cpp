@@ -174,7 +174,7 @@ void MainController::init(QCoreApplication *app)
 
             _self->_sensorDataSeries = new SensorDataParser(_self);
             _self->_gpsDataSeries = new GpsCsvSeries(_self);
-            _self->_dataRecorder = new CsvRecorder(_self);
+            _self->_dataRecorder = new CsvRecorder("data", _self);
 
             _self->_dataRecorder->setUpdateInterval(50);
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getWheelPowerASeries());
@@ -189,6 +189,10 @@ void MainController::init(QCoreApplication *app)
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuFrontYawSeries());
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuFrontPitchSeries());
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuFrontRollSeries());
+            _self->_dataRecorder->addColumn(_self->_wheelSpeedLODataSeries);
+            _self->_dataRecorder->addColumn(_self->_wheelSpeedLMDataSeries);
+            _self->_dataRecorder->addColumn(_self->_wheelSpeedRODataSeries);
+            _self->_dataRecorder->addColumn(_self->_wheelSpeedRMDataSeries);
             _self->_dataRecorder->addColumn(_self->_gpsDataSeries->getLatitudeSeries());
             _self->_dataRecorder->addColumn(_self->_gpsDataSeries->getLongitudeSeries());
             connect(_self->_gpsServer, &GpsServer::gpsUpdate, _self->_gpsDataSeries, &GpsCsvSeries::addLocation);
@@ -228,7 +232,7 @@ void MainController::sendSystemStatusMessage() {
 bool MainController::startDataRecording(QDateTime startTime) {
     LOG_I(LOG_TAG, "Starting test log with start time of " + QString::number(startTime.toMSecsSinceEpoch()));
 
-    return _dataRecorder->startLog(startTime);
+    return _dataRecorder->startLog(startTime, CsvRecorder::RECORDING_MODE_ON_INTERVAL);
 }
 
 void MainController::stopDataRecording() {
@@ -257,6 +261,10 @@ void MainController::driveChannelMessageReceived(const char* message, Channel::M
     reinterpret_cast<qint32&>(messageType) = (qint32)reinterpret_cast<unsigned char&>(header);
     switch (messageType) {
     case MbedMessage_Drive:
+        _wheelSpeedLMDataSeries->onDriveCommand(message);
+        _wheelSpeedLODataSeries->onDriveCommand(message);
+        _wheelSpeedRMDataSeries->onDriveCommand(message);
+        _wheelSpeedRODataSeries->onDriveCommand(message);
         _mbed->sendMessage(message, (int)size);
         break;
     default:

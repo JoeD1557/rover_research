@@ -30,7 +30,8 @@ SOURCES += \
     sensordataparser.cpp \
     gstreamerutil.cpp \
     mediastreamer.cpp \
-    confloader.cpp
+    confloader.cpp \
+    wheelspeedcsvseries.cpp
 
 HEADERS += \
     channel.h \
@@ -50,7 +51,8 @@ HEADERS += \
     gstreamerutil.h \
     soro_core_global.h \
     mediastreamer.h \
-    confloader.h
+    confloader.h \
+    wheelspeedcsvseries.h
 
 #Link Qt5GStreamer
 LIBS += -lQt5GStreamer-1.0 -lQt5GLib-2.0 -lQt5GStreamerUtils-1.0

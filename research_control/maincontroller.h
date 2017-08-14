@@ -9,6 +9,7 @@
 #include "soro_core/sensordataparser.h"
 #include "soro_core/gpscsvseries.h"
 #include "soro_core/channel.h"
+#include "soro_core/wheelspeedcsvseries.h"
 
 #include "latencycsvseries.h"
 #include "commentcsvseries.h"
@@ -25,6 +26,15 @@
 #include "bitratedowncsvseries.h"
 #include "bitrateupcsvseries.h"
 #include "gstreamerrecorder.h"
+#include "audiomodecsvseries.h"
+#include "videomodecsvseries.h"
+#include "videocodeccsvseries.h"
+#include "videoheightcsvseries.h"
+#include "videowidthcsvseries.h"
+#include "videobitratecsvseries.h"
+#include "videoframeratecsvseries.h"
+#include "hudparallaxcsvseries.h"
+#include "hudlatencycsvseries.h"
 
 namespace Soro {
 
@@ -64,12 +74,28 @@ private:
     // Data recording systems
     SensorDataParser *_sensorDataSeries = 0;
     GpsCsvSeries *_gpsDataSeries = 0;
+    WheelSpeedCsvSeries *_wheelSpeedLODataSeries = 0;
+    WheelSpeedCsvSeries *_wheelSpeedLMDataSeries = 0;
+    WheelSpeedCsvSeries *_wheelSpeedRODataSeries = 0;
+    WheelSpeedCsvSeries *_wheelSpeedRMDataSeries = 0;
+    AudioModeCsvSeries *_audioModeDataSeries = 0;
+    VideoModeCsvSeries *_videoModeDataSeries = 0;
+    VideoHeightCsvSeries *_videoHeightDataSeries = 0;
+    VideoWidthCsvSeries *_videoWidthDataSeries = 0;
+    VideoCodecCsvSeries *_videoCodecDataSeries = 0;
+    VideoBitrateCsvSeries *_videoBitrateDataSeries = 0;
+    VideoFramerateCsvSeries *_videoFramerateDataSeries = 0;
+    HudParallaxCsvSeries *_hudParallaxDataSeries = 0;
+    HudLatencyCsvSeries *_hudLatencyDataSeries = 0;
     ConnectionEventCsvSeries *_connectionEventSeries = 0;
     LatencyCsvSeries *_latencyDataSeries = 0;
     CommentCsvSeries *_commentDataSeries = 0;
+
     BitrateUpCsvSeries *_bitrateUpDataSeries = 0;
     BitrateDownCsvSeries *_bitrateDownDataSeries = 0;
     CsvRecorder *_dataRecorder = 0;
+    CsvRecorder *_commentRecorder = 0;
+    CsvRecorder *_settingsRecorder = 0;
 
     int _bitrateUpdateTimerId;
 

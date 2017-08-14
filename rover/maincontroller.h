@@ -10,6 +10,7 @@
 #include "soro_core/sensordataparser.h"
 #include "soro_core/gpscsvseries.h"
 #include "soro_core/drivemessage.h"
+#include "soro_core/wheelspeedcsvseries.h"
 
 #include "gpsserver.h"
 #include "audioserver.h"
@@ -50,6 +51,10 @@ private:
      */
     VideoServer *_mainCameraServer = 0;
     VideoServer *_aux1CameraServer = 0;
+    WheelSpeedCsvSeries *_wheelSpeedLODataSeries = 0;
+    WheelSpeedCsvSeries *_wheelSpeedLMDataSeries = 0;
+    WheelSpeedCsvSeries *_wheelSpeedRODataSeries = 0;
+    WheelSpeedCsvSeries *_wheelSpeedRMDataSeries = 0;
     QString _aux1CameraDevice;
     QString _stereoRCameraDevice;
     QString _stereoLCameraDevice;

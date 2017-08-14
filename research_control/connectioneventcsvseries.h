@@ -9,7 +9,7 @@
 
 namespace Soro {
 
-class ConnectionEventCsvSeries: public QObject, public CsvDataSeries
+class ConnectionEventCsvSeries: public CsvDataSeries
 {
     Q_OBJECT
 public:

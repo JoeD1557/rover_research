@@ -5,7 +5,7 @@
 
 namespace Soro {
 
-class BitrateUpCsvSeries: public QObject, public CsvDataSeries
+class BitrateUpCsvSeries: public CsvDataSeries
 {
     Q_OBJECT
 public:

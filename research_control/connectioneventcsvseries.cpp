@@ -18,13 +18,11 @@
 
 namespace Soro {
 
-ConnectionEventCsvSeries::ConnectionEventCsvSeries(QObject *parent) : QObject(parent)
-{
-}
+ConnectionEventCsvSeries::ConnectionEventCsvSeries(QObject *parent) : CsvDataSeries(parent) { }
 
 QString ConnectionEventCsvSeries::getSeriesName() const
 {
-    return "Events";
+    return "Connection Events";
 }
 
 bool ConnectionEventCsvSeries::shouldKeepOldValues() const

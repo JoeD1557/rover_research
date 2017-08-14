@@ -14,23 +14,32 @@
  * limitations under the License.
  */
 
-#include "bitratedowncsvseries.h"
+#include "videomodecsvseries.h"
 
 namespace Soro {
 
-BitrateDownCsvSeries::BitrateDownCsvSeries(QObject *parent) : CsvDataSeries(parent) { }
+VideoModeCsvSeries::VideoModeCsvSeries(QObject *parent) : CsvDataSeries(parent) { }
 
-QString BitrateDownCsvSeries::getSeriesName() const
+QString VideoModeCsvSeries::getSeriesName() const
 {
-    return "Bitrate To Rover (b/s)";
+    return "Video Mode";
 }
 
-void BitrateDownCsvSeries::bitrateUpdate(int bpsDown)
+void VideoModeCsvSeries::onSettingsChanged(const SettingsModel *settings)
 {
-    update(QVariant(bpsDown));
+    if (settings->enableVideo)
+    {
+        QString colorMode = settings->selectedVideoGrayscale ? "Grayscale" : "Color";
+        QString stereoMode = settings->enableStereoVideo ? "Stereo" : "Mono";
+        update(QVariant(stereoMode + "/" + colorMode));
+    }
+    else
+    {
+        update(QVariant("Off"));
+    }
 }
 
-bool BitrateDownCsvSeries::shouldKeepOldValues() const
+bool VideoModeCsvSeries::shouldKeepOldValues() const
 {
     return true;
 }

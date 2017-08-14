@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-#include "bitratedowncsvseries.h"
+#include "audiomodecsvseries.h"
 
 namespace Soro {
 
-BitrateDownCsvSeries::BitrateDownCsvSeries(QObject *parent) : CsvDataSeries(parent) { }
+AudioModeCsvSeries::AudioModeCsvSeries(QObject *parent) : CsvDataSeries(parent) { }
 
-QString BitrateDownCsvSeries::getSeriesName() const
+QString AudioModeCsvSeries::getSeriesName() const
 {
-    return "Bitrate To Rover (b/s)";
+    return "Audio Mode";
 }
 
-void BitrateDownCsvSeries::bitrateUpdate(int bpsDown)
+void AudioModeCsvSeries::onSettingsChanged(const SettingsModel *settings)
 {
-    update(QVariant(bpsDown));
+    update(QVariant(settings->enableAudio ? "On" : "Off"));
 }
 
-bool BitrateDownCsvSeries::shouldKeepOldValues() const
+bool AudioModeCsvSeries::shouldKeepOldValues() const
 {
     return true;
 }

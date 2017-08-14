@@ -205,8 +205,9 @@ void MainWindowController::onSensorUpdate(char tag, int value)
         _window->setProperty("middleRoll", value);
         break;
     case SensorDataParser::DATATAG_IMUDATA_FRONT_YAW:
-        //_window->setProperty("compassHeading", (value - 100) * 360.0f / 800.0f); // original code
-        _window->setProperty("compassHeading", ((value - 100) * 360.0f / 800.0f*(-1.0))-50); // modified by MAG
+       // _window->setProperty("compassHeading", (value - 100) * 360.0f / 800.0f); // original code
+        _window->setProperty("compassHeading", ((100 - value) * 360.0f / 800.0f)-130);  //Modified July 31 2017- works
+       //_window->setProperty("compassHeading", ((value - 100) * 360.0f / 800.0f*(-1.0))-50); //modified by MAG before Jul 31 2017
         break;
     }
 }

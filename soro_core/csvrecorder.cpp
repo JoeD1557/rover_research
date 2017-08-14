@@ -24,6 +24,8 @@
 
 namespace Soro {
 
+CsvDataSeries::CsvDataSeries(QObject *parent) : QObject(parent) { }
+
 QVariant CsvDataSeries::getValue() const {
     return _value;
 }
@@ -33,18 +35,22 @@ qint64 CsvDataSeries::getValueTime() const {
 }
 
 void CsvDataSeries::update(QVariant value) {
-    _value = value;
     _valueTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    if (_value != value) {
+        _value = value;
+        Q_EMIT valueUpdated();
+    }
 }
 
 ////////////////////////////////////////
 
-CsvRecorder::CsvRecorder(QObject *parent) : QObject(parent)
+CsvRecorder::CsvRecorder(QString logName, QObject *parent) : QObject(parent)
 {
     _updateInterval = 100;
+    _logName = logName;
 }
 
-bool CsvRecorder::startLog(QDateTime loggedStartTime)
+bool CsvRecorder::startLog(QDateTime loggedStartTime, CsvRecorder::RecordingMode mode)
 {
     stopLog();
 
@@ -61,7 +67,7 @@ bool CsvRecorder::startLog(QDateTime loggedStartTime)
     }
 
     _logStartTime = loggedStartTime.toMSecsSinceEpoch();
-    filePath += "/" + loggedStartTime.toString("M-dd_h.mm.ss_AP") + ".csv";
+    filePath += "/" + _logName + "_" + loggedStartTime.toString("M-dd_h.mm.ss_AP") + ".csv";
     _file = new QFile(filePath, this);
 
     if (_file->exists())
@@ -73,7 +79,14 @@ bool CsvRecorder::startLog(QDateTime loggedStartTime)
         _fileStream = new QTextStream(_file);
         // Write header to file
         *_fileStream << "Recording started at " << loggedStartTime.toString() << "\n";
-        *_fileStream << "Rows in this file were updated every " << _updateInterval << " milleseconds\n";
+        if (mode == RECORDING_MODE_ON_INTERVAL)
+        {
+            *_fileStream << "Rows in this file were updated every " << _updateInterval << " milleseconds\n";
+        }
+        else
+        {
+            *_fileStream << "Rows in this file were updated on demand\n";
+        }
         *_fileStream << "\n";
 
         for (const CsvDataSeries* column : _columns)
@@ -83,7 +96,17 @@ bool CsvRecorder::startLog(QDateTime loggedStartTime)
         *_fileStream << "\n";
 
         LOG_I(LOG_TAG, "Starting log " + QString::number(_logStartTime));
-        START_TIMER(_updateTimerId, _updateInterval);
+        if (mode == RECORDING_MODE_ON_INTERVAL)
+        {
+            START_TIMER(_updateTimerId, _updateInterval);
+        }
+        else
+        {
+            for (const CsvDataSeries* column : _columns)
+            {
+               connect(column, &CsvDataSeries::valueUpdated, this, &CsvRecorder::onSeriesUpdated);
+            }
+        }
         _isRecording = true;
         Q_EMIT logStarted(loggedStartTime);
         return true;
@@ -101,6 +124,10 @@ void CsvRecorder::stopLog()
     if (_isRecording)
     {
         KILL_TIMER(_updateTimerId);
+        for (const CsvDataSeries* column : _columns)
+        {
+           disconnect(column, &CsvDataSeries::valueUpdated, this, &CsvRecorder::onSeriesUpdated);
+        }
         delete _fileStream;
         _fileStream = nullptr;
         LOG_I(LOG_TAG, "Ending log " + QString::number(_logStartTime));
@@ -165,6 +192,11 @@ void CsvRecorder::removeColumn(const CsvDataSeries *series)
     }
 }
 
+void CsvRecorder::onSeriesUpdated()
+{
+    logRow();
+}
+
 void CsvRecorder::clearColumns()
 {
     if (_isRecording)
@@ -176,11 +208,9 @@ void CsvRecorder::clearColumns()
     _columnDataTimestamps.clear();
 }
 
-void CsvRecorder::timerEvent(QTimerEvent *e)
+void CsvRecorder::logRow()
 {
-    QObject::timerEvent(e);
-
-    if ((e->timerId() == _updateTimerId) && _fileStream)
+    if (_fileStream)
     {
         for (const CsvDataSeries *column : _columns)
         {
@@ -194,6 +224,16 @@ void CsvRecorder::timerEvent(QTimerEvent *e)
             }
         }
         *_fileStream << "\n";
+    }
+}
+
+void CsvRecorder::timerEvent(QTimerEvent *e)
+{
+    QObject::timerEvent(e);
+
+    if ((e->timerId() == _updateTimerId))
+    {
+        logRow();
     }
 }
 

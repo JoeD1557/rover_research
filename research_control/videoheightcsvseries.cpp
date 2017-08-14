@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-#include "bitratedowncsvseries.h"
+#include "videoheightcsvseries.h"
 
 namespace Soro {
 
-BitrateDownCsvSeries::BitrateDownCsvSeries(QObject *parent) : CsvDataSeries(parent) { }
+VideoHeightCsvSeries::VideoHeightCsvSeries(QObject *parent) : CsvDataSeries(parent) { }
 
-QString BitrateDownCsvSeries::getSeriesName() const
+QString VideoHeightCsvSeries::getSeriesName() const
 {
-    return "Bitrate To Rover (b/s)";
+    return "Video Height";
 }
 
-void BitrateDownCsvSeries::bitrateUpdate(int bpsDown)
+void VideoHeightCsvSeries::onSettingsChanged(const SettingsModel *settings)
 {
-    update(QVariant(bpsDown));
+    update(QVariant(settings->selectedVideoHeight));
 }
 
-bool BitrateDownCsvSeries::shouldKeepOldValues() const
+bool VideoHeightCsvSeries::shouldKeepOldValues() const
 {
     return true;
 }

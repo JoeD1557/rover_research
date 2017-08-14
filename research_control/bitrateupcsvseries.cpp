@@ -18,7 +18,7 @@
 
 namespace Soro {
 
-BitrateUpCsvSeries::BitrateUpCsvSeries(QObject *parent) : QObject(parent) { }
+BitrateUpCsvSeries::BitrateUpCsvSeries(QObject *parent) : CsvDataSeries(parent) { }
 
 QString BitrateUpCsvSeries::getSeriesName() const
 {

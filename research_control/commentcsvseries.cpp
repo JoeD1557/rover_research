@@ -18,7 +18,7 @@
 
 namespace Soro {
 
-CommentCsvSeries::CommentCsvSeries(QObject *parent) : QObject(parent) { }
+CommentCsvSeries::CommentCsvSeries(QObject *parent) : CsvDataSeries(parent) { }
 
 QString CommentCsvSeries::getSeriesName() const
 {

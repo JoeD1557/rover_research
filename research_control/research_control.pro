@@ -37,7 +37,16 @@ SOURCES += main.cpp \
     qmlgstreamerpainteditem.cpp \
     camerasettingsmodel.cpp \
     bitrateupcsvseries.cpp \
-    bitratedowncsvseries.cpp
+    bitratedowncsvseries.cpp \
+    videobitratecsvseries.cpp \
+    videocodeccsvseries.cpp \
+    videowidthcsvseries.cpp \
+    videoheightcsvseries.cpp \
+    videomodecsvseries.cpp \
+    audiomodecsvseries.cpp \
+    videoframeratecsvseries.cpp \
+    hudparallaxcsvseries.cpp \
+    hudlatencycsvseries.cpp
 
 HEADERS  += \
     settingsmodel.h \
@@ -64,7 +73,16 @@ HEADERS  += \
     commentswindowcontroller.h \
     camerasettingsmodel.h \
     bitrateupcsvseries.h \
-    bitratedowncsvseries.h
+    bitratedowncsvseries.h \
+    videobitratecsvseries.h \
+    videocodeccsvseries.h \
+    videowidthcsvseries.h \
+    videoheightcsvseries.h \
+    videomodecsvseries.h \
+    audiomodecsvseries.h \
+    videoframeratecsvseries.h \
+    hudparallaxcsvseries.h \
+    hudlatencycsvseries.h
 
 RESOURCES += \
     qml.qrc \

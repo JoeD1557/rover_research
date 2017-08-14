@@ -197,11 +197,24 @@ void MainController::init(QApplication *app)
             _self->_gpsDataSeries = new GpsCsvSeries(_self);
             _self->_connectionEventSeries = new ConnectionEventCsvSeries(_self);
             _self->_latencyDataSeries = new LatencyCsvSeries(_self);
+            _self->_wheelSpeedLMDataSeries = new WheelSpeedCsvSeries(DriveMessage::Index_LeftMiddle, _self);
+            _self->_wheelSpeedLODataSeries = new WheelSpeedCsvSeries(DriveMessage::Index_LeftOuter, _self);
+            _self->_wheelSpeedRMDataSeries = new WheelSpeedCsvSeries(DriveMessage::Index_RightMiddle, _self);
+            _self->_wheelSpeedRODataSeries = new WheelSpeedCsvSeries(DriveMessage::Index_RightOuter, _self);
             _self->_commentDataSeries = new CommentCsvSeries(_self);
             _self->_bitrateUpDataSeries = new BitrateUpCsvSeries(_self);
             _self->_bitrateDownDataSeries = new BitrateDownCsvSeries(_self);
+            _self->_audioModeDataSeries = new AudioModeCsvSeries(_self);
+            _self->_videoModeDataSeries = new VideoModeCsvSeries(_self);
+            _self->_videoCodecDataSeries = new VideoCodecCsvSeries(_self);
+            _self->_videoWidthDataSeries = new VideoWidthCsvSeries(_self);
+            _self->_videoHeightDataSeries = new VideoHeightCsvSeries(_self);
+            _self->_videoBitrateDataSeries = new VideoBitrateCsvSeries(_self);
+            _self->_videoFramerateDataSeries = new VideoFramerateCsvSeries(_self);
+            _self->_hudParallaxDataSeries = new HudParallaxCsvSeries(_self);
+            _self->_hudLatencyDataSeries = new HudLatencyCsvSeries(_self);
 
-            _self->_dataRecorder = new CsvRecorder(_self);
+            _self->_dataRecorder = new CsvRecorder("data", _self);
             _self->_dataRecorder->setUpdateInterval(50);
 
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getWheelPowerASeries());
@@ -219,19 +232,44 @@ void MainController::init(QApplication *app)
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuFrontYawSeries());
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuFrontPitchSeries());
             _self->_dataRecorder->addColumn(_self->_sensorDataSeries->getImuFrontRollSeries());
+            _self->_dataRecorder->addColumn(_self->_wheelSpeedLODataSeries);
+            _self->_dataRecorder->addColumn(_self->_wheelSpeedLMDataSeries);
+            _self->_dataRecorder->addColumn(_self->_wheelSpeedRODataSeries);
+            _self->_dataRecorder->addColumn(_self->_wheelSpeedRMDataSeries);
             _self->_dataRecorder->addColumn(_self->_gpsDataSeries->getLatitudeSeries());
             _self->_dataRecorder->addColumn(_self->_gpsDataSeries->getLongitudeSeries());
-            _self->_dataRecorder->addColumn(_self->_connectionEventSeries);
             _self->_dataRecorder->addColumn(_self->_bitrateUpDataSeries);
             _self->_dataRecorder->addColumn(_self->_bitrateDownDataSeries);
             _self->_dataRecorder->addColumn(_self->_latencyDataSeries->getRealLatencySeries());
-            _self->_dataRecorder->addColumn(_self->_latencyDataSeries->getSimulatedLatencySeries());
-            _self->_dataRecorder->addColumn(_self->_commentDataSeries);
+
+            _self->_commentRecorder = new CsvRecorder("comments", _self);
+            _self->_commentRecorder->addColumn(_self->_commentDataSeries);
+
+            _self->_settingsRecorder = new CsvRecorder("settings", _self);
+            _self->_settingsRecorder->addColumn(_self->_connectionEventSeries);
+            _self->_settingsRecorder->addColumn(_self->_latencyDataSeries->getSimulatedLatencySeries());
+            _self->_settingsRecorder->addColumn(_self->_videoModeDataSeries);
+            _self->_settingsRecorder->addColumn(_self->_videoCodecDataSeries);
+            _self->_settingsRecorder->addColumn(_self->_videoWidthDataSeries);
+            _self->_settingsRecorder->addColumn(_self->_videoHeightDataSeries);
+            _self->_settingsRecorder->addColumn(_self->_videoFramerateDataSeries);
+            _self->_settingsRecorder->addColumn(_self->_videoBitrateDataSeries);
+            _self->_settingsRecorder->addColumn(_self->_audioModeDataSeries);
+            _self->_settingsRecorder->addColumn(_self->_hudParallaxDataSeries);
+            _self->_settingsRecorder->addColumn(_self->_hudLatencyDataSeries);
 
             connect(_self->_mainChannel, &Channel::stateChanged,
                     _self->_connectionEventSeries, &ConnectionEventCsvSeries::mainChannelStateChanged);
             connect(_self->_driveSystem->getChannel(), &Channel::stateChanged,
                     _self->_connectionEventSeries, &ConnectionEventCsvSeries::driveChannelStateChanged);
+            connect(_self->_driveSystem, &DriveControlSystem::driveMessageSent,
+                    _self->_wheelSpeedLMDataSeries, &WheelSpeedCsvSeries::onDriveCommand);
+            connect(_self->_driveSystem, &DriveControlSystem::driveMessageSent,
+                    _self->_wheelSpeedLODataSeries, &WheelSpeedCsvSeries::onDriveCommand);
+            connect(_self->_driveSystem, &DriveControlSystem::driveMessageSent,
+                    _self->_wheelSpeedRMDataSeries, &WheelSpeedCsvSeries::onDriveCommand);
+            connect(_self->_driveSystem, &DriveControlSystem::driveMessageSent,
+                    _self->_wheelSpeedRODataSeries, &WheelSpeedCsvSeries::onDriveCommand);
 
             //
             // Initialize QML engine and register custom items
@@ -362,6 +400,8 @@ void MainController::startDataRecording()
 void MainController::stopDataRecording()
 {
     _dataRecorder->stopLog();
+    _commentRecorder->stopLog();
+    _settingsRecorder->stopLog();
     _controlWindow->setRecordingState(RecordingState_Idle);
     _commentsWindow->setRecordingState(RecordingState_Idle);
     _mainWindow->setRecordingState(RecordingState_Idle);
@@ -444,6 +484,16 @@ void MainController::onSettingsApplied()
     }
     _driveSystem->getChannel()->setSimulatedDelay(_settings.selectedLatency);
     _latencyDataSeries->updateSimulatedLatency(_settings.selectedLatency);
+
+    _audioModeDataSeries->onSettingsChanged(&_settings);
+    _videoModeDataSeries->onSettingsChanged(&_settings);
+    _videoBitrateDataSeries->onSettingsChanged(&_settings);
+    _videoWidthDataSeries->onSettingsChanged(&_settings);
+    _videoHeightDataSeries->onSettingsChanged(&_settings);
+    _videoCodecDataSeries->onSettingsChanged(&_settings);
+    _videoFramerateDataSeries->onSettingsChanged(&_settings);
+    _hudParallaxDataSeries->onSettingsChanged(&_settings);
+    _hudLatencyDataSeries->onSettingsChanged(&_settings);
 }
 
 void MainController::onVideoClientStateChanged(MediaClient *client, MediaClient::State state)
@@ -626,7 +676,13 @@ void MainController::onMainChannelMessageReceived(const char *message, Channel::
     }
     case MainMessageType_StartDataRecording: {
         // Rover has responed that they are starting data recording, start ours
-        if (!_dataRecorder->startLog(QDateTime::fromMSecsSinceEpoch(_recordStartTime)))
+        if (!_dataRecorder->startLog(
+                    QDateTime::fromMSecsSinceEpoch(_recordStartTime),
+                    CsvRecorder::RECORDING_MODE_ON_INTERVAL) ||
+            !_commentRecorder->startLog(QDateTime::fromMSecsSinceEpoch(_recordStartTime),
+                    CsvRecorder::RECORDING_MODE_ON_DEMAND) ||
+            !_settingsRecorder->startLog(QDateTime::fromMSecsSinceEpoch(_recordStartTime),
+                    CsvRecorder::RECORDING_MODE_ON_DEMAND))
         {
             stopDataRecording();
             _controlWindow->notify(NotificationType_Error,

@@ -5,7 +5,7 @@
 
 namespace Soro {
 
-class CommentCsvSeries: public QObject, public CsvDataSeries
+class CommentCsvSeries : public CsvDataSeries
 {
     Q_OBJECT
 public:
