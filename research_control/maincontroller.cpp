@@ -156,6 +156,10 @@ void MainController::init(QApplication *app)
                     _self->_driveSystem, &DriveControlSystem::gamepadPoll);
             connect(_self->_gamepad, &GamepadManager::gamepadChanged,
                     _self->_driveSystem, &DriveControlSystem::gamepadChanged);
+            connect(_self->_gamepad, &GamepadManager::poll, _self, [] (const GamepadManager::GamepadState *state) {
+                    _self->_gamepadXDataSeries->gamepadXChanged(state->axisLeftX);
+                    _self->_gamepadYDataSeries->gamepadYChanged(state->axisLeftY);
+            });
 
             _self->_mainChannel->open();
             _self->_driveSystem->enable();
@@ -213,6 +217,8 @@ void MainController::init(QApplication *app)
             _self->_videoFramerateDataSeries = new VideoFramerateCsvSeries(_self);
             _self->_hudParallaxDataSeries = new HudParallaxCsvSeries(_self);
             _self->_hudLatencyDataSeries = new HudLatencyCsvSeries(_self);
+            _self->_gamepadXDataSeries = new GamepadXCsvSeries(_self);
+            _self->_gamepadYDataSeries = new GamepadYCsvSeries(_self);
 
             _self->_dataRecorder = new CsvRecorder("data", _self);
             _self->_dataRecorder->setUpdateInterval(50);
@@ -236,6 +242,8 @@ void MainController::init(QApplication *app)
             _self->_dataRecorder->addColumn(_self->_wheelSpeedLMDataSeries);
             _self->_dataRecorder->addColumn(_self->_wheelSpeedRODataSeries);
             _self->_dataRecorder->addColumn(_self->_wheelSpeedRMDataSeries);
+            _self->_dataRecorder->addColumn(_self->_gamepadXDataSeries);
+            _self->_dataRecorder->addColumn(_self->_gamepadYDataSeries);
             _self->_dataRecorder->addColumn(_self->_gpsDataSeries->getLatitudeSeries());
             _self->_dataRecorder->addColumn(_self->_gpsDataSeries->getLongitudeSeries());
             _self->_dataRecorder->addColumn(_self->_bitrateUpDataSeries);

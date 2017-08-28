@@ -46,7 +46,9 @@ SOURCES += main.cpp \
     audiomodecsvseries.cpp \
     videoframeratecsvseries.cpp \
     hudparallaxcsvseries.cpp \
-    hudlatencycsvseries.cpp
+    hudlatencycsvseries.cpp \
+    gamepadycsvseries.cpp \
+    gamepadxcsvseries.cpp
 
 HEADERS  += \
     settingsmodel.h \
@@ -82,7 +84,9 @@ HEADERS  += \
     audiomodecsvseries.h \
     videoframeratecsvseries.h \
     hudparallaxcsvseries.h \
-    hudlatencycsvseries.h
+    hudlatencycsvseries.h \
+    gamepadycsvseries.h \
+    gamepadxcsvseries.h
 
 RESOURCES += \
     qml.qrc \

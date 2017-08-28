@@ -35,6 +35,8 @@
 #include "videoframeratecsvseries.h"
 #include "hudparallaxcsvseries.h"
 #include "hudlatencycsvseries.h"
+#include "gamepadxcsvseries.h"
+#include "gamepadycsvseries.h"
 
 namespace Soro {
 
@@ -90,6 +92,8 @@ private:
     ConnectionEventCsvSeries *_connectionEventSeries = 0;
     LatencyCsvSeries *_latencyDataSeries = 0;
     CommentCsvSeries *_commentDataSeries = 0;
+    GamepadXCsvSeries *_gamepadXDataSeries = 0;
+    GamepadYCsvSeries *_gamepadYDataSeries = 0;
 
     BitrateUpCsvSeries *_bitrateUpDataSeries = 0;
     BitrateDownCsvSeries *_bitrateDownDataSeries = 0;

@@ -38,6 +38,7 @@ ApplicationWindow {
     property int wheelBLPower: 0
     property int wheelBRPower: 0
     property real compassHeading: 0
+    property real compassHeadingZero: 0
 
     property bool stereo: false
     property bool hudVisible: true
@@ -60,6 +61,7 @@ ApplicationWindow {
         rearPitchZero = rearPitch
         frontRollZero = frontRoll
         rearRollZero = rearRoll
+        compassHeadingZero = compassHeading
     }
 
     GStreamerSurface {
@@ -77,6 +79,7 @@ ApplicationWindow {
             x: stereo ? overlayItem.width / 4 - width / 2 : overlayItem.width / 2 - width / 2
             y: 12
             compassHeading: mainWindow.compassHeading
+            compassHeadingZero: mainWindow.compassHeadingZero
             width: parent.height * 0.12
             height: width
             halfWidth: stereo
@@ -159,6 +162,7 @@ ApplicationWindow {
             x: overlayItem.width / 4 * 3 - width / 2
             y: 12
             compassHeading: mainWindow.compassHeading
+            compassHeadingZero: mainWindow.compassHeadingZero
             width: parent.height * 0.12
             height: width
             halfWidth: true

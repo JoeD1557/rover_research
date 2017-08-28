@@ -6,6 +6,7 @@ Item {
     id: root
     property bool halfWidth: false
     property real compassHeading: 0
+    property real compassHeadingZero: 0
 
     transform: Scale { xScale: halfWidth ? 0.5 : 1 }
 
@@ -14,7 +15,7 @@ Item {
         anchors.fill: navDirectionImageColorOverlay
         radius: 10
         samples: radius
-        rotation: compassHeading
+        rotation: compassHeading - compassHeadingZero
         spread: 0.2
         color: "#000000"
     }
